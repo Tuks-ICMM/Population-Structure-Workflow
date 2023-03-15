@@ -1,0 +1,119 @@
+from pandas import read_csv
+from os.path import join
+
+__author__ = "Graeme Ford"
+__credits__ = [
+    "Graeme Ford",
+    "Prof. Michael S. Pepper",
+    "Prof. Fourie Joubert",
+    "Antionette Colic",
+    "Fatima Barmania",
+    "Sarah Turner",
+    "Megan Holborn",
+]
+__version__ = "1.0.0"
+__maintainer__ = "Graeme Ford"
+__email__ = "graeme.ford@tuks.co.za"
+__status__ = "Development"
+
+# Enforce version check
+min_version("6.0")
+
+
+# DEFINE CONFIG FILE FOR SNAKEMAKE:
+configfile: join("config", "config.json")
+
+
+# IMPORT SAMPLES METADATA
+samples = read_csv(join("input", "samples.csv"), header=0)
+
+# SET CLUSTER CATEGORIES
+clusters = set(
+    [cluster for cluster in samples.keys() if cluster not in ["sample_name", "dataset"]]
+)
+
+# DEFINE CONTEXT-VARIABLES:
+bExtensions = ["bed", "bim", "fam"]
+tExtensions = ["map", "ped"]
+
+
+rule Admixture_v1p3:
+    """
+    An imlementation of the Admixture-1.3 software, a parametric maximum-likelihood-based sofwtare for group assignment in population genetics.
+    """
+    input:
+        "vcf.gz",
+    output:
+        "Admixture-1.3_{cluster}.yes",
+    envmodules:
+        "admixture-1.3",
+        "plink-1.9",
+    shell:
+        """
+        plink --vcf {input} --make-bed --out ALL
+        echo -e "\n--- LOG SECTION START | Admixture-1.3 'k-means maximum-liklihood group assignment' ---" 1>&2
+        admixture
+        echo -e "--- LOG SECTION END | Admixture-1.3 'k-means maximum-liklihood group assignment' ---\n" 1>&2
+        """
+
+
+rule STRUCTURE:
+    """
+    An imlementation of the STURCTURE software, a parametric beysian-based sofwtare for group assignment in population genetics.
+    """
+    input:
+        "vcf.gz",
+    output:
+        "STRUCTURE_{cluster}.yes",
+    envmodules:
+        "structure",
+    shell:
+        """
+        echo -e "\n--- LOG SECTION START | STRUCTURE 'k-means beysian group assignment' ---" 1>&2
+        structure
+        echo -e "--- LOG SECTION END | STRUCTURE 'k-means beysian group assignment' ---\n" 1>&2
+        """
+
+
+rule Plink_PCA:
+    """
+    An imlementation of the Plink-2.0 softwares variance-standardized relationship-matrix based PCA method.
+    """
+    input:
+        "vcf.gz",
+    output:
+        "Plink-PCA_{cluster}.eigenvec",
+        "Plink-PCA_{cluster}.eigenval",
+    envmodules:
+        "plink-2",
+    shell:
+        """
+        echo -e "\n--- LOG SECTION START | Plink-2.0 'Principle Component Analysis (PCA)' ---" 1>&2
+        plink2 --vcf {input} --pca --out {wildcards.cluster}
+        echo -e "--- LOG SECTION END | Plink-2.0 'Principle Component Analysis (PCA)' ---\n" 1>&2
+        """
+
+
+rule DAPC:
+    """
+    An implpementation of the Discriminant Analysis of Principle Components, an altered framework for solving for discriminate components.
+    """
+    input:
+        "vcf.gz",
+    output:
+        "DAPC_{cluster}.yes",
+    envmodules:
+        "r",
+    script:
+        "dapc.rmd"
+
+
+rule all:
+    """
+    Full suite of analyses to describe population structure using both parametric and non-parametric methods.
+    """
+    input:
+        "Admixture_1_3_{cluster}.yes",
+        "STRUCTURE_{cluster}.yes",
+        "Plink-PCA_{cluster}.yes",
+        "DAPC_{cluster}.yes",
