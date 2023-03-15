@@ -18,8 +18,11 @@ __status__ = "Development"
 # Enforce version check
 min_version("7.24.2")  # DEFINE CONFIG FILE FOR SNAKEMAKE:
 
+# IMPORT SAMPLES METADATA
+configfile: join("config", "config.json")
 
-configfile: join("config", "config.json")  # IMPORT SAMPLES METADATA
+# SET REPORT TEMPLATE
+report: "report/template.rst"
 
 # IMPORT SAMPLE METADATA
 samples = read_csv(join("input", "samples.csv"), header=0)
@@ -112,8 +115,8 @@ rule DAPC:
     input:
         "results/FILTER/ALL_FILTERED.vcf.gz",
     output:
-        "results/{cluster_assignment}/Population_Structure/DAPC_scatter_plot.png",
-        "results/{cluster_assignment}/Population_Structure/DAPC_population_inferences.png",
+        report("results/{cluster_assignment}/Population_Structure/DAPC_scatter_plot.png", category="{cluster_assignment}", subcategory="DAPC"),
+        report("results/{cluster_assignment}/Population_Structure/DAPC_population_inferences.png", category="{cluster_assignment}", subcategory="DAPC"),
     envmodules:
         "r"
     params:
