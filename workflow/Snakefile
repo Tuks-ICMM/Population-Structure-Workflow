@@ -1,14 +1,13 @@
 from pandas import read_csv
 from os.path import join
+from snakemake.utils import min_version
 
 __author__ = "Graeme Ford"
 __credits__ = [
     "Graeme Ford",
     "Prof. Michael S. Pepper",
     "Prof. Fourie Joubert",
-    "Antionette Colic",
     "Fatima Barmania",
-    "Sarah Turner",
     "Megan Holborn",
 ]
 __version__ = "1.0.0"
@@ -17,19 +16,17 @@ __email__ = "graeme.ford@tuks.co.za"
 __status__ = "Development"
 
 # Enforce version check
-min_version("6.0")
+min_version("7.24.2")  # DEFINE CONFIG FILE FOR SNAKEMAKE:
 
 
-# DEFINE CONFIG FILE FOR SNAKEMAKE:
-configfile: join("config", "config.json")
+configfile: join("config", "config.json")  # IMPORT SAMPLES METADATA
 
-
-# IMPORT SAMPLES METADATA
+# IMPORT SAMPLE METADATA
 samples = read_csv(join("input", "samples.csv"), header=0)
 
 # SET CLUSTER CATEGORIES
-clusters = set(
-    [cluster for cluster in samples.keys() if cluster not in ["sample_name", "dataset"]]
+cluster_assignments = set(
+    [grouping_category for grouping_category in samples.keys() if grouping_category not in ["sample_name", "dataset"]]
 )
 
 # DEFINE CONTEXT-VARIABLES:
@@ -41,19 +38,24 @@ rule Admixture_v1p3:
     """
     An imlementation of the Admixture-1.3 software, a parametric maximum-likelihood-based sofwtare for group assignment in population genetics.
     """
+
     input:
-        "vcf.gz",
+        "results/FILTER/ALL_FILTERED.vcf.gz",
     output:
-        "Admixture-1.3_{cluster}.yes",
+        "results/{cluster_assignment}/Population_Structure/Admixture_1.3.{k}.P",
+        "results/{cluster_assignment}/Population_Structure/Admixture_1.3.{k}.Q",
     envmodules:
         "admixture-1.3",
         "plink-1.9",
     shell:
         """
-        plink --vcf {input} --make-bed --out ALL
-        echo -e "\n--- LOG SECTION START | Admixture-1.3 'k-means maximum-liklihood group assignment' ---" 1>&2
-        admixture
-        echo -e "--- LOG SECTION END | Admixture-1.3 'k-means maximum-liklihood group assignment' ---\n" 1>&2
+        echo -e "\n--- LOG SECTION START | Plink-1.9 'Prepare input file forat' ---" 1>&2
+        plink --vcf {input} --make-bed --out Admixture_1.3
+        echo -e "--- LOG SECTION END | Plink-1.9 'Prepare input file forat' ---\n" 1>&2
+
+        echo -e "\n--- LOG SECTION START | Admixture-1.3 'Perform k-means maximum-liklihood group assignment' ---" 1>&2
+        admixture Admixture_1.3.bed {wildcards.k}
+        echo -e "--- LOG SECTION END | Admixture-1.3 'Perform k-means maximum-liklihood group assignment' ---\n" 1>&2
         """
 
 
@@ -61,17 +63,18 @@ rule STRUCTURE:
     """
     An imlementation of the STURCTURE software, a parametric beysian-based sofwtare for group assignment in population genetics.
     """
+
     input:
-        "vcf.gz",
+        "results/FILTER/ALL_FILTERED.vcf.gz",
     output:
-        "STRUCTURE_{cluster}.yes",
+        "results/{cluster_assignment}/Population_Structure/STRUCTURE_{cluster}.yes",
     envmodules:
         "structure",
     shell:
         """
-        echo -e "\n--- LOG SECTION START | STRUCTURE 'k-means beysian group assignment' ---" 1>&2
+        echo -e "\n--- LOG SECTION START | STRUCTURE 'Perform k-means beysian group assignment' ---" 1>&2
         structure
-        echo -e "--- LOG SECTION END | STRUCTURE 'k-means beysian group assignment' ---\n" 1>&2
+        echo -e "--- LOG SECTION END | STRUCTURE 'Perform k-means beysian group assignment' ---\n" 1>&2
         """
 
 
@@ -79,18 +82,25 @@ rule Plink_PCA:
     """
     An imlementation of the Plink-2.0 softwares variance-standardized relationship-matrix based PCA method.
     """
+
     input:
-        "vcf.gz",
+        "results/FILTER/ALL_FILTERED.vcf.gz",
     output:
-        "Plink-PCA_{cluster}.eigenvec",
-        "Plink-PCA_{cluster}.eigenval",
+        "results/{cluster_assignment}/Population_Structure/Plink-PCA.prune.in",
+        "results/{cluster_assignment}/Population_Structure/Plink-PCA.prune.out",
+        "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec",
+        "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec.allele",
     envmodules:
         "plink-2",
     shell:
         """
-        echo -e "\n--- LOG SECTION START | Plink-2.0 'Principle Component Analysis (PCA)' ---" 1>&2
-        plink2 --vcf {input} --pca --out {wildcards.cluster}
-        echo -e "--- LOG SECTION END | Plink-2.0 'Principle Component Analysis (PCA)' ---\n" 1>&2
+        echo -e "\n--- LOG SECTION START | Plink-2.0 'Filter variants in disequilibrium' ---" 1>&2
+        plink2 --vcf {input} --indep-pairwise 50 5 0.5 --out Plink-PCA
+        echo -e "--- LOG SECTION END | Plink-2.0 'Filter variants in disequilibrium' ---\n" 1>&2
+
+        echo -e "\n--- LOG SECTION START | Plink-2.0 'Perform Principle Component Analysis (PCA)' ---" 1>&2
+        plink2 --vcf {input} --exclude Plink-PCA.prune.out --mac 2 --pca allele-wts vzs scols=sid --out Plink-PCA
+        echo -e "--- LOG SECTION END | Plink-2.0 'Perform Principle Component Analysis (PCA)' ---\n" 1>&2
         """
 
 
@@ -98,22 +108,49 @@ rule DAPC:
     """
     An implpementation of the Discriminant Analysis of Principle Components, an altered framework for solving for discriminate components.
     """
+
     input:
-        "vcf.gz",
+        "results/FILTER/ALL_FILTERED.vcf.gz",
     output:
-        "DAPC_{cluster}.yes",
+        "results/{cluster_assignment}/Population_Structure/DAPC_scatter_plot.png",
+        "results/{cluster_assignment}/Population_Structure/DAPC_population_inferences.png",
     envmodules:
-        "r",
+        "r"
+    params:
+        cluster_assignments = lambda wildcards: samples[wildcards.cluster].tolist()
     script:
-        "dapc.rmd"
+        "scripts/dapc.rmd"
 
 
 rule all:
     """
     Full suite of analyses to describe population structure using both parametric and non-parametric methods.
     """
+    
+    default_target: True
     input:
-        "Admixture_1_3_{cluster}.yes",
-        "STRUCTURE_{cluster}.yes",
-        "Plink-PCA_{cluster}.yes",
-        "DAPC_{cluster}.yes",
+        expand(
+            [
+                "results/{cluster_assignment}/Population_Structure/Admixture_1.3.{k}.P",
+                "results/{cluster_assignment}/Population_Structure/Admixture_1.3.{k}.Q",
+            ],
+            zip,
+            cluster_assignment=samples.keys(),
+            k=[len(samples[clusters].unique()) for clusters in samples.keys() if clusters not in ["sample_name", "dataset"]]
+        ),
+        expand(
+            [
+                
+
+                # "results/{cluster_assignment}/Population_Structure/STRUCTURE_{cluster}.yes",
+
+                "results/{cluster_assignment}/Population_Structure/Plink-PCA.prune.in",
+                "results/{cluster_assignment}/Population_Structure/Plink-PCA.prune.out",
+                "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec",
+                "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec.allele",
+                
+                "results/{cluster_assignment}/Population_Structure/DAPC_scatter_plot.png",
+                "results/{cluster_assignment}/Population_Structure/DAPC_population_inferences.png",
+            ], 
+            cluster_assignment=samples
+        )
