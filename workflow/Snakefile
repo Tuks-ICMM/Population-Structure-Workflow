@@ -151,8 +151,8 @@ rule all:
                 "results/{cluster_assignment}/Population_Structure/Admixture_1.3.{k}.Q",
             ],
             zip,
-            cluster_assignment=samples.keys(),
-            k=[len(samples[clusters].unique()) for clusters in samples.keys() if clusters not in ["sample_name", "dataset"]]
+            cluster_assignment=[grouping_name for grouping_name in samples.keys() if grouping_name != "sample_name"],
+            k=[len(samples[clusters].unique()) for clusters in samples.keys() if clusters != "sample_name"]
         ),
         expand(
             [
@@ -164,5 +164,5 @@ rule all:
                 "results/{cluster_assignment}/Population_Structure/DAPC_scatter_plot.png",
                 "results/{cluster_assignment}/Population_Structure/DAPC_population_inferences.png",
             ], 
-            cluster_assignment=samples.keys()
+            cluster_assignment=[grouping_name for grouping_name in samples.keys() if grouping_name != "sample_name"]
         )
