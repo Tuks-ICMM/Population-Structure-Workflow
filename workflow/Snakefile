@@ -1,5 +1,5 @@
 from pandas import read_csv
-from os.path import join
+from os.path import join, isfile
 from snakemake.utils import min_version
 
 __author__ = "Graeme Ford"
@@ -16,7 +16,7 @@ __email__ = "graeme.ford@tuks.co.za"
 __status__ = "Development"
 
 # Enforce version check
-min_version("7.24.2")  # DEFINE CONFIG FILE FOR SNAKEMAKE:
+min_version("6")  # DEFINE CONFIG FILE FOR SNAKEMAKE:
 
 # IMPORT SAMPLES METADATA
 configfile: join("config", "config.json")
@@ -36,7 +36,7 @@ cluster_assignments = set(
 bExtensions = ["bed", "bim", "fam"]
 tExtensions = ["map", "ped"]
 
-if not isFile("input/All.vcf.gz"):
+if not isfile("input/All.vcf.gz"):
     rule SymLink:
         """
         Create a symbolic link to the input folder when this is used aspart of the Pharmacogenetics workflow.
@@ -170,5 +170,5 @@ rule all:
                 "results/{cluster_assignment}/Population_Structure/DAPC_scatter_plot.png",
                 "results/{cluster_assignment}/Population_Structure/DAPC_population_inferences.png",
             ], 
-            cluster_assignment=samples
+            cluster_assignment=samples.keys()
         )
