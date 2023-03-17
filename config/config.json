@@ -1,1 +1,62 @@
-{}
+{
+    "reference-genomes": [
+        {
+            "version": "GRCh38",
+            "file_path": [
+                "/",
+                "nlustre",
+                "users",
+                "graeme",
+                "ARCHIVE_Public",
+                "REFERENCE_GRCh38",
+                "GRCh38.fa.gz"
+            ]
+        }
+    ],
+    "environment": {
+        "email": {
+            "address": "graeme.ford@tuks.co.za",
+            "conditions": [
+                "o",
+                "e"
+            ]
+        },
+        "queues": [
+            {
+                "queue": "long",
+                "walltime": "900:00:00",
+                "memory": "128G",
+                "cores": "10",
+                "nodes": "1",
+                "rules": [
+                    "all",
+                    "VALIDATE",
+                    "LIFTOVER",
+                    "COLLATE",
+                    "ALL_COLLATE",
+                    "ANNOTATE",
+                    "ADMIXTURE",
+                    "TRIM_AND_NAME"
+                ]
+            },
+            {
+                "queue": "normal",
+                "walltime": "30:00:00",
+                "memory": "128G",
+                "cores": "10",
+                "nodes": "1",
+                "rules": [
+                    "FILTER",
+                    "TRANSPILE_CLUSTERS",
+                    "PLINK"
+                ]
+            }
+        ]
+    },
+    "envmodules": {
+        "Plink-2": "plink-2",
+        "Plink-1.9": "plink-1.9",
+        "STRUCTURE": "structure-2.3.4",
+        "Admixture-1.3": "admixture-1.3"
+    }
+}

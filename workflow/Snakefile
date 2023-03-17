@@ -36,6 +36,20 @@ cluster_assignments = set(
 bExtensions = ["bed", "bim", "fam"]
 tExtensions = ["map", "ped"]
 
+rule SymLink:
+    """
+    Create a symbolic link to the input folder when this is used aspart of the Pharmacogenetics workflow.
+    """
+
+    input:
+        "results/FILTER/ALL_FILTERED.vcf.gz",
+    output:
+        "input/All.vcf.gz"
+    shell:
+        """
+        ln -s {input} {output}
+        """
+
 
 rule Admixture_v1p3:
     """
@@ -43,13 +57,13 @@ rule Admixture_v1p3:
     """
 
     input:
-        "results/FILTER/ALL_FILTERED.vcf.gz",
+        "input/All.vcf.gz"
     output:
         "results/{cluster_assignment}/Population_Structure/Admixture_1.3.{k}.P",
         "results/{cluster_assignment}/Population_Structure/Admixture_1.3.{k}.Q",
     envmodules:
-        "admixture-1.3",
-        "plink-1.9",
+        config["envmodules"]["Admixture-1.3"],
+        config["envmodules"]["Plink-1.9"],
     shell:
         """
         echo -e "\n--- LOG SECTION START | Plink-1.9 'Prepare input file forat' ---" 1>&2
@@ -62,23 +76,23 @@ rule Admixture_v1p3:
         """
 
 
-rule STRUCTURE:
-    """
-    An imlementation of the STURCTURE software, a parametric beysian-based sofwtare for group assignment in population genetics.
-    """
+# rule STRUCTURE:
+#     """
+#     An imlementation of the STURCTURE software, a parametric beysian-based sofwtare for group assignment in population genetics.
+#     """
 
-    input:
-        "results/FILTER/ALL_FILTERED.vcf.gz",
-    output:
-        "results/{cluster_assignment}/Population_Structure/STRUCTURE_{cluster}.yes",
-    envmodules:
-        "structure",
-    shell:
-        """
-        echo -e "\n--- LOG SECTION START | STRUCTURE 'Perform k-means beysian group assignment' ---" 1>&2
-        structure
-        echo -e "--- LOG SECTION END | STRUCTURE 'Perform k-means beysian group assignment' ---\n" 1>&2
-        """
+#     input:
+#         "input/All.vcf.gz"
+#     output:
+#         "results/{cluster_assignment}/Population_Structure/STRUCTURE_{cluster}.yes",
+#     envmodules:
+#         config["envmodules"]["STRUCTURE"],
+#     shell:
+#         """
+#         echo -e "\n--- LOG SECTION START | STRUCTURE 'Perform k-means beysian group assignment' ---" 1>&2
+#         structure
+#         echo -e "--- LOG SECTION END | STRUCTURE 'Perform k-means beysian group assignment' ---\n" 1>&2
+#         """
 
 
 rule Plink_PCA:
@@ -87,14 +101,14 @@ rule Plink_PCA:
     """
 
     input:
-        "results/FILTER/ALL_FILTERED.vcf.gz",
+        "input/All.vcf.gz"
     output:
         "results/{cluster_assignment}/Population_Structure/Plink-PCA.prune.in",
         "results/{cluster_assignment}/Population_Structure/Plink-PCA.prune.out",
         "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec",
         "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec.allele",
     envmodules:
-        "plink-2",
+        config["envmodules"]["Plink-2"],
     shell:
         """
         echo -e "\n--- LOG SECTION START | Plink-2.0 'Filter variants in disequilibrium' ---" 1>&2
@@ -113,7 +127,7 @@ rule DAPC:
     """
 
     input:
-        "results/FILTER/ALL_FILTERED.vcf.gz",
+        "input/All.vcf.gz"
     output:
         report("results/{cluster_assignment}/Population_Structure/DAPC_scatter_plot.png", category="{cluster_assignment}", subcategory="DAPC"),
         report("results/{cluster_assignment}/Population_Structure/DAPC_population_inferences.png", category="{cluster_assignment}", subcategory="DAPC"),
