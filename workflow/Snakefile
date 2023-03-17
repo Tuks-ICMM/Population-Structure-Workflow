@@ -130,8 +130,8 @@ rule DAPC:
     input:
         "input/All.vcf.gz"
     output:
-        report("results/{{cluster_assignment}}/Population_Structure/DAPC_scatter_plot.png", category="DAPC"),
-        report("results/{{cluster_assignment}}/Population_Structure/DAPC_population_inferences.png", category="DAPC"),
+        report("results/{cluster_assignment}/Population_Structure/DAPC_scatter_plot.png", category="{cluster_assignment}", subcategory="DAPC"),
+        report("results/{cluster_assignment}/Population_Structure/DAPC_population_inferences.png", category="{cluster_assignment}", subcategory="DAPC"),
     envmodules:
         config["envmodules"]["R"]
     params:
