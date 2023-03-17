@@ -133,7 +133,7 @@ rule DAPC:
         report("results/{cluster_assignment}/Population_Structure/DAPC_scatter_plot.png", category="{cluster_assignment}", subcategory="DAPC"),
         report("results/{cluster_assignment}/Population_Structure/DAPC_population_inferences.png", category="{cluster_assignment}", subcategory="DAPC"),
     envmodules:
-        config["software"]["R"]
+        config["envmodules"]["R"]
     params:
         cluster_assignments = lambda wildcards: samples[wildcards.cluster].tolist()
     script:
