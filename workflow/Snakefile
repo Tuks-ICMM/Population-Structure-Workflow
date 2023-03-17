@@ -133,7 +133,7 @@ rule DAPC:
         report("results/{cluster_assignment}/Population_Structure/DAPC_scatter_plot.png", category="{cluster_assignment}", subcategory="DAPC"),
         report("results/{cluster_assignment}/Population_Structure/DAPC_population_inferences.png", category="{cluster_assignment}", subcategory="DAPC"),
     envmodules:
-        "r"
+        config["software"]["R"]
     params:
         cluster_assignments = lambda wildcards: samples[wildcards.cluster].tolist()
     script:
@@ -144,8 +144,6 @@ rule all:
     """
     Full suite of analyses to describe population structure using both parametric and non-parametric methods.
     """
-    
-    # default_target: True
     input:
         expand(
             [
@@ -158,10 +156,6 @@ rule all:
         ),
         expand(
             [
-                
-
-                # "results/{cluster_assignment}/Population_Structure/STRUCTURE_{cluster}.yes",
-
                 "results/{cluster_assignment}/Population_Structure/Plink-PCA.prune.in",
                 "results/{cluster_assignment}/Population_Structure/Plink-PCA.prune.out",
                 "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec",
