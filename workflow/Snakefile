@@ -36,19 +36,20 @@ cluster_assignments = set(
 bExtensions = ["bed", "bim", "fam"]
 tExtensions = ["map", "ped"]
 
-rule SymLink:
-    """
-    Create a symbolic link to the input folder when this is used aspart of the Pharmacogenetics workflow.
-    """
+if not isFile("input/All.vcf.gz"):
+    rule SymLink:
+        """
+        Create a symbolic link to the input folder when this is used aspart of the Pharmacogenetics workflow.
+        """
 
-    input:
-        "results/FILTER/ALL_FILTERED.vcf.gz",
-    output:
-        "input/All.vcf.gz"
-    shell:
-        """
-        ln -s {input} {output}
-        """
+        input:
+            "results/FILTER/ALL_FILTERED.vcf.gz",
+        output:
+            "input/All.vcf.gz"
+        shell:
+            """
+            ln -s {input} {output}
+            """
 
 
 rule Admixture_v1p3:
