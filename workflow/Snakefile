@@ -95,31 +95,32 @@ rule Admixture_v1p3:
 #         echo -e "--- LOG SECTION END | STRUCTURE 'Perform k-means beysian group assignment' ---\n" 1>&2
 #         """
 
-
-rule Plink_PCA:
-    """
-    An imlementation of the Plink-2.0 softwares variance-standardized relationship-matrix based PCA method.
-    """
-
-    input:
-        "input/All.vcf.gz"
-    output:
-        "results/{cluster_assignment}/Population_Structure/Plink-PCA.prune.in",
-        "results/{cluster_assignment}/Population_Structure/Plink-PCA.prune.out",
-        "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec",
-        "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec.allele",
-    envmodules:
-        config["envmodules"]["Plink-2"],
-    shell:
+# Unfortionately Plink-2.0's PCA requires at least 50 samples in order to run a PCA. If it does not get them, it will error and kill the process otherwise.
+if not len(samples.index) < 50:
+    rule Plink_PCA:
         """
-        echo -e "\n--- LOG SECTION START | Plink-2.0 'Filter variants in disequilibrium' ---" 1>&2
-        plink2 --vcf {input} --indep-pairwise 50 5 0.5 --out Plink-PCA
-        echo -e "--- LOG SECTION END | Plink-2.0 'Filter variants in disequilibrium' ---\n" 1>&2
-
-        echo -e "\n--- LOG SECTION START | Plink-2.0 'Perform Principle Component Analysis (PCA)' ---" 1>&2
-        plink2 --vcf {input} --exclude Plink-PCA.prune.out --mac 2 --pca allele-wts vzs scols=sid --out Plink-PCA
-        echo -e "--- LOG SECTION END | Plink-2.0 'Perform Principle Component Analysis (PCA)' ---\n" 1>&2
+        An imlementation of the Plink-2.0 softwares variance-standardized relationship-matrix based PCA method.
         """
+
+        input:
+            "input/All.vcf.gz"
+        output:
+            "results/{cluster_assignment}/Population_Structure/Plink-PCA.prune.in",
+            "results/{cluster_assignment}/Population_Structure/Plink-PCA.prune.out",
+            "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec",
+            "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec.allele",
+        envmodules:
+            config["envmodules"]["Plink-2"],
+        shell:
+            """
+            echo -e "\n--- LOG SECTION START | Plink-2.0 'Filter variants in disequilibrium' ---" 1>&2
+            plink2 --vcf {input} --indep-pairwise 50 5 0.5 --out Plink-PCA
+            echo -e "--- LOG SECTION END | Plink-2.0 'Filter variants in disequilibrium' ---\n" 1>&2
+
+            echo -e "\n--- LOG SECTION START | Plink-2.0 'Perform Principle Component Analysis (PCA)' ---" 1>&2
+            plink2 --vcf {input} --exclude Plink-PCA.prune.out --mac 2 --pca allele-wts vzs scols=sid --out Plink-PCA
+            echo -e "--- LOG SECTION END | Plink-2.0 'Perform Principle Component Analysis (PCA)' ---\n" 1>&2
+            """
 
 
 rule DAPC:
@@ -156,13 +157,19 @@ rule all:
         ),
         expand(
             [
-                "results/{cluster_assignment}/Population_Structure/Plink-PCA.prune.in",
-                "results/{cluster_assignment}/Population_Structure/Plink-PCA.prune.out",
-                "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec",
-                "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec.allele",
-                
                 "results/{cluster_assignment}/Population_Structure/DAPC_scatter_plot.png",
                 "results/{cluster_assignment}/Population_Structure/DAPC_population_inferences.png",
             ], 
             cluster_assignment=[grouping_name for grouping_name in samples.keys() if grouping_name != "sample_name"]
         )
+        # Plink-2.0 min 50 samples limit or pipeline go boom
+        if not len(samples.index) < 50:
+            expand(
+                [
+                "results/{cluster_assignment}/Population_Structure/Plink-PCA.prune.in",
+                "results/{cluster_assignment}/Population_Structure/Plink-PCA.prune.out",
+                "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec",
+                "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec.allele",
+            ],
+            cluster_assignment=[grouping_name for grouping_name in samples.keys() if grouping_name != "sample_name"]
+            )
