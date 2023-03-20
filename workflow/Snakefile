@@ -1,7 +1,7 @@
 from pandas import read_csv
 from os.path import join, isfile
 from snakemake.utils import min_version
-from snakemake.file import expand
+from snakemake.io import expand
 
 __author__ = "Graeme Ford"
 __credits__ = [
