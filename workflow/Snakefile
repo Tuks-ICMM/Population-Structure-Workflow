@@ -1,6 +1,7 @@
 from pandas import read_csv
 from os.path import join, isfile
 from snakemake.utils import min_version
+from snakemake.file import expand
 
 __author__ = "Graeme Ford"
 __credits__ = [
@@ -18,18 +19,25 @@ __status__ = "Development"
 # Enforce version check
 min_version("6")  # DEFINE CONFIG FILE FOR SNAKEMAKE:
 
+
 # IMPORT SAMPLES METADATA
 configfile: join("config", "config.json")
 
+
 # SET REPORT TEMPLATE
 report: "report/template.rst"
+
 
 # IMPORT SAMPLE METADATA
 samples = read_csv(join("input", "samples.csv"), header=0)
 
 # SET CLUSTER CATEGORIES
 cluster_assignments = set(
-    [grouping_category for grouping_category in samples.keys() if grouping_category not in ["sample_name", "dataset"]]
+    [
+        grouping_category
+        for grouping_category in samples.keys()
+        if grouping_category not in ["sample_name", "dataset"]
+    ]
 )
 
 # DEFINE CONTEXT-VARIABLES:
@@ -37,18 +45,20 @@ bExtensions = ["bed", "bim", "fam"]
 tExtensions = ["map", "ped"]
 
 if not isfile("input/All.vcf.gz"):
+
     rule SymLink:
         """
         Create a symbolic link to the input folder when this is used aspart of the Pharmacogenetics workflow.
         """
-
         input:
             "results/FILTER/ALL_FILTERED.vcf.gz",
         output:
-            "input/All.vcf.gz"
+            "input/All.vcf.gz",
         shell:
             """
+
             ln -s {input} {output}
+
             """
 
 
@@ -56,9 +66,8 @@ rule Admixture_v1p3:
     """
     An imlementation of the Admixture-1.3 software, a parametric maximum-likelihood-based sofwtare for group assignment in population genetics.
     """
-
     input:
-        "input/All.vcf.gz"
+        "input/All.vcf.gz",
     output:
         "results/{cluster_assignment}/Population_Structure/Admixture_1.3.{k}.P",
         "results/{cluster_assignment}/Population_Structure/Admixture_1.3.{k}.Q",
@@ -67,13 +76,21 @@ rule Admixture_v1p3:
         config["envmodules"]["Plink-1.9"],
     shell:
         """
+
         echo -e "\n--- LOG SECTION START | Plink-1.9 'Prepare input file forat' ---" 1>&2
+
         plink --vcf {input} --make-bed --out Admixture_1.3
+
         echo -e "--- LOG SECTION END | Plink-1.9 'Prepare input file forat' ---\n" 1>&2
 
+
+
         echo -e "\n--- LOG SECTION START | Admixture-1.3 'Perform k-means maximum-liklihood group assignment' ---" 1>&2
+
         admixture Admixture_1.3.bed {wildcards.k}
+
         echo -e "--- LOG SECTION END | Admixture-1.3 'Perform k-means maximum-liklihood group assignment' ---\n" 1>&2
+
         """
 
 
@@ -101,9 +118,8 @@ if not len(samples.index) < 50:
         """
         An imlementation of the Plink-2.0 softwares variance-standardized relationship-matrix based PCA method.
         """
-
         input:
-            "input/All.vcf.gz"
+            "input/All.vcf.gz",
         output:
             "results/{cluster_assignment}/Population_Structure/Plink-PCA.prune.in",
             "results/{cluster_assignment}/Population_Structure/Plink-PCA.prune.out",
@@ -117,6 +133,8 @@ if not len(samples.index) < 50:
             plink2 --vcf {input} --indep-pairwise 50 5 0.5 --out Plink-PCA
             echo -e "--- LOG SECTION END | Plink-2.0 'Filter variants in disequilibrium' ---\n" 1>&2
 
+
+
             echo -e "\n--- LOG SECTION START | Plink-2.0 'Perform Principle Component Analysis (PCA)' ---" 1>&2
             plink2 --vcf {input} --exclude Plink-PCA.prune.out --mac 2 --pca allele-wts vzs scols=sid --out Plink-PCA
             echo -e "--- LOG SECTION END | Plink-2.0 'Perform Principle Component Analysis (PCA)' ---\n" 1>&2
@@ -127,52 +145,88 @@ rule DAPC:
     """
     An implpementation of the Discriminant Analysis of Principle Components, an altered framework for solving for discriminate components.
     """
-
     input:
-        "input/All.vcf.gz"
+        "input/All.vcf.gz",
     output:
-        report("results/{cluster_assignment}/Population_Structure/DAPC_scatter_plot.png", category="{cluster_assignment}", subcategory="DAPC"),
-        report("results/{cluster_assignment}/Population_Structure/DAPC_population_inferences.png", category="{cluster_assignment}", subcategory="DAPC"),
+        report(
+            "results/{cluster_assignment}/Population_Structure/DAPC_scatter_plot.png",
+            category="{cluster_assignment}",
+            subcategory="DAPC",
+        ),
+        report(
+            "results/{cluster_assignment}/Population_Structure/DAPC_population_inferences.png",
+            category="{cluster_assignment}",
+            subcategory="DAPC",
+        ),
     envmodules:
-        config["envmodules"]["R"]
+        config["envmodules"]["R"],
     params:
-        cluster_assignments = lambda wildcards: samples[wildcards.cluster_assignment].tolist()
+        cluster_assignments=lambda wildcards: samples[
+            wildcards.cluster_assignment
+        ].tolist(),
     script:
         "scripts/dapc.rmd"
 
+
+analysis_files = []
+# Admixture-1.3
+analysis_files.append(
+    expand(
+        [
+            "results/{cluster_assignment}/Population_Structure/Admixture_1.3.{k}.P",
+            "results/{cluster_assignment}/Population_Structure/Admixture_1.3.{k}.Q",
+        ],
+        zip,
+        cluster_assignment=[
+            grouping_name
+            for grouping_name in samples.keys()
+            if grouping_name != "sample_name"
+        ],
+        k=[
+            len(samples[clusters].unique())
+            for clusters in samples.keys()
+            if clusters != "sample_name"
+        ],
+    )
+)
+
+# DAPC
+analysis_files.append(
+    expand(
+        [
+            "results/{cluster_assignment}/Population_Structure/DAPC_scatter_plot.png",
+            "results/{cluster_assignment}/Population_Structure/DAPC_population_inferences.png",
+        ],
+        cluster_assignment=[
+            grouping_name
+            for grouping_name in samples.keys()
+            if grouping_name != "sample_name"
+        ],
+    )
+)
+
+# Plink-2.0 min 50 samples limit or pipeline go boom
+if not len(samples.index) < 50:
+    # Plink-2.0
+    analysis_files.append(
+        expand(
+            [
+                "results/{cluster_assignment}/Population_Structure/Plink-PCA.prune.in",
+                "results/{cluster_assignment}/Population_Structure/Plink-PCA.prune.out",
+                "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec",
+                "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec.allele",
+            ],
+            cluster_assignment=[
+                grouping_name
+                for grouping_name in samples.keys()
+                if grouping_name != "sample_name"
+            ],
+        )
+    )
 
 rule all:
     """
     Full suite of analyses to describe population structure using both parametric and non-parametric methods.
     """
     input:
-        # Admixture-1.3
-        expand(
-            [
-                "results/{cluster_assignment}/Population_Structure/Admixture_1.3.{k}.P",
-                "results/{cluster_assignment}/Population_Structure/Admixture_1.3.{k}.Q",
-            ],
-            zip,
-            cluster_assignment=[grouping_name for grouping_name in samples.keys() if grouping_name != "sample_name"],
-            k=[len(samples[clusters].unique()) for clusters in samples.keys() if clusters != "sample_name"]
-        ),
-
-        # DAPC
-        expand(
-            [
-                "results/{cluster_assignment}/Population_Structure/DAPC_scatter_plot.png",
-                "results/{cluster_assignment}/Population_Structure/DAPC_population_inferences.png",
-            ], 
-            cluster_assignment=[grouping_name for grouping_name in samples.keys() if grouping_name != "sample_name"]
-        ),
-
-        # Plink-2.0
-        expand(
-            [
-            "results/{cluster_assignment}/Population_Structure/Plink-PCA.prune.in",
-            "results/{cluster_assignment}/Population_Structure/Plink-PCA.prune.out",
-            "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec",
-            "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec.allele",
-        ],
-        cluster_assignment=[grouping_name for grouping_name in samples.keys() if grouping_name != "sample_name"]
-        ) if not len(samples.index) < 50 # Plink-2.0 min 50 samples limit or pipeline go boom
+        analysis_files,
