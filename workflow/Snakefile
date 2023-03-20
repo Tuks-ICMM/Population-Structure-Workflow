@@ -146,6 +146,7 @@ rule all:
     Full suite of analyses to describe population structure using both parametric and non-parametric methods.
     """
     input:
+        # Admixture-1.3
         expand(
             [
                 "results/{cluster_assignment}/Population_Structure/Admixture_1.3.{k}.P",
@@ -155,21 +156,23 @@ rule all:
             cluster_assignment=[grouping_name for grouping_name in samples.keys() if grouping_name != "sample_name"],
             k=[len(samples[clusters].unique()) for clusters in samples.keys() if clusters != "sample_name"]
         ),
+
+        # DAPC
         expand(
             [
                 "results/{cluster_assignment}/Population_Structure/DAPC_scatter_plot.png",
                 "results/{cluster_assignment}/Population_Structure/DAPC_population_inferences.png",
             ], 
             cluster_assignment=[grouping_name for grouping_name in samples.keys() if grouping_name != "sample_name"]
-        )
-        # Plink-2.0 min 50 samples limit or pipeline go boom
-        if not len(samples.index) < 50:
-            expand(
-                [
-                "results/{cluster_assignment}/Population_Structure/Plink-PCA.prune.in",
-                "results/{cluster_assignment}/Population_Structure/Plink-PCA.prune.out",
-                "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec",
-                "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec.allele",
-            ],
-            cluster_assignment=[grouping_name for grouping_name in samples.keys() if grouping_name != "sample_name"]
-            )
+        ),
+
+        # Plink-2.0
+        expand(
+            [
+            "results/{cluster_assignment}/Population_Structure/Plink-PCA.prune.in",
+            "results/{cluster_assignment}/Population_Structure/Plink-PCA.prune.out",
+            "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec",
+            "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec.allele",
+        ],
+        cluster_assignment=[grouping_name for grouping_name in samples.keys() if grouping_name != "sample_name"]
+        ) if not len(samples.index) < 50 # Plink-2.0 min 50 samples limit or pipeline go boom
