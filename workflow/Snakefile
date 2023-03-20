@@ -135,7 +135,7 @@ rule DAPC:
     envmodules:
         config["envmodules"]["R"]
     params:
-        cluster_assignments = lambda wildcards: samples[wildcards.cluster].tolist()
+        cluster_assignments = lambda wildcards: samples[wildcards.cluster_assignment].tolist()
     script:
         "scripts/dapc.rmd"
 
