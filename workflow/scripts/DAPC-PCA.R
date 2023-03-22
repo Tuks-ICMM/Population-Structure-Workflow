@@ -10,10 +10,10 @@ pop(vcf) <- as.factor(snakemake@params[["cluster_assignments"]])
 
 grp <- find.clusters(
   vcf,
-  n.clust = 8,
+  n.clust = length(snakemake@params[["cluster_assignments"]]),
   n.pca = 10,
   pca.select = "percVar",
-  perc.pca = 80
+  perc.pca = 90
 )
 
 table(pop(vcf), grp$grp)
@@ -31,7 +31,11 @@ table.value(
 )
 dev.off()
 
-dapc_results <- dapc(vcf, grp$grp)
+dapc_results <- dapc(
+  vcf, grp$grp,
+  n.clust = length(snakemake@params[["cluster_assignments"]]),
+  n.pca = 10
+)
 
 png(
   filename = sprintf(
