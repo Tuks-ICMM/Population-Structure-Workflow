@@ -7,10 +7,11 @@ library("readr")
 vcf <- vcfR2genind(read.vcfR(snakemake@input[[1]]))
 # samples <- read.csv(snakemake@params['samples'])
 pop(vcf) <- as.factor(snakemake@params[["cluster_assignments"]])
+prin
 
 grp <- find.clusters(
   vcf,
-  n.clust = length(snakemake@params[["cluster_assignments"]]),
+  n.clust = length(unique(snakemake@params[["cluster_assignments"]])),
   n.pca = 10,
   pca.select = "percVar",
   perc.pca = 90
@@ -36,8 +37,9 @@ dapc_results <- dapc(
   truenames = TRUE,
   var.contrib = TRUE,
   var.loadings = TRUE,
-  n.clust = length(snakemake@params[["cluster_assignments"]]),
+  n.clust = length(unique(snakemake@params[["cluster_assignments"]])),
   n.pca = 10,
+  n.da = 10,
   pca.info = TRUE,
   pca.select = "percVar",
   perc.pca = 90,
