@@ -33,8 +33,14 @@ dev.off()
 
 dapc_results <- dapc(
   vcf, grp$grp,
+  truenames = TRUE,
+  var.contrib = TRUE,
+  var.loadings = TRUE,
   n.clust = length(snakemake@params[["cluster_assignments"]]),
-  n.pca = 10
+  n.pca = 10,
+  pca.info = TRUE,
+  pca.select = "percVar",
+  perc.pca = 90,
 )
 
 png(
