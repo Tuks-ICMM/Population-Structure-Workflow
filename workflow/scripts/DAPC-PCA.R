@@ -18,17 +18,12 @@ grp <- find.clusters(
 
 table(pop(vcf), grp$grp)
 
-# Set margins for charts:
-col.labpar(mar = c(1, 1, 1, 1))
-
 
 png(
   filename = sprintf(
     "results/%s/Population_Structure/DAPC_population_inferences.png",
     snakemake@wildcards[["cluster_assignment"]]
-  ),
-  width = 13.3,
-  height = 7.5
+  )
 )
 table.value(
   table(pop(vcf), grp$grp),
@@ -42,9 +37,7 @@ png(
   filename = sprintf(
     "results/%s/Population_Structure/DAPC_scatter_plot.png",
     snakemake@wildcards[["cluster_assignment"]]
-  ),
-  width = 13.3,
-  height = 7.5
+  )
 )
 scatter(
   dapc_results,
