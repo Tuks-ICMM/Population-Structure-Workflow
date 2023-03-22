@@ -6,7 +6,7 @@ library("readr")
 
 vcf <- vcfR2genind(read.vcfR(snakemake@input[[1]]))
 # samples <- read.csv(snakemake@params['samples'])
-pop(vcf) <- as.factor(snakemake@params["cluster_assignments"])
+pop(vcf) <- as.factor(snakemake@params[["cluster_assignments"]])
 
 grp <- find.clusters(
   vcf,
