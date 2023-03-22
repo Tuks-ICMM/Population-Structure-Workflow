@@ -4,7 +4,7 @@ library("readr")
 # library("tidyverse")
 
 
-vcf <- vcfR2genind(read.vcfR("snakemake@input"))
+vcf <- vcfR2genind(read.vcfR(snakemake@input))
 # samples <- read.csv(snakemake@params['samples'])
 pop(vcf) <- as.factor(snakemake@params["cluster_assignments"])
 
