@@ -165,7 +165,7 @@ rule DAPC:
             wildcards.cluster_assignment
         ].tolist(),
     script:
-        "scripts/dapc.R"
+        "scripts/dapc.r"
 
 
 analysis_files = []
