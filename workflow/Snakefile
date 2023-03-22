@@ -125,7 +125,7 @@ if not len(samples.index) < 50:
             "results/{cluster_assignment}/Population_Structure/Plink-PCA.prune.out",
             "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec",# `--pca` Eigenvectors
             "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenval",# `--pca` Eigenvalues
-            "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec.alleles.zst", # `--pca` Allele weights
+            "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec.allele.zst", # `--pca` Allele weights
         envmodules:
             config["envmodules"]["Plink-2"],
         shell:
@@ -216,7 +216,7 @@ if not len(samples.index) < 50:
                 "results/{cluster_assignment}/Population_Structure/Plink-PCA.prune.out",
                 "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec",# `--pca` Eigenvectors
                 "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenval",# `--pca` Eigenvalues
-                "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec.alleles.zst", # `--pca` Allele weights
+                "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec.allele.zst", # `--pca` Allele weights
             ],
             cluster_assignment=[
                 grouping_name
