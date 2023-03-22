@@ -18,6 +18,10 @@ grp <- find.clusters(
 
 table(pop(vcf), grp$grp)
 
+# Set margins for charts:
+col.labpar(mar = c(1, 1, 1, 1))
+
+
 png(
   filename = sprintf(
     "results/%s/Population_Structure/DAPC_population_inferences.png",
