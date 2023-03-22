@@ -1,7 +1,7 @@
 library("adegenet")
 library("vcfR")
 library("readr")
-library("tidyverse")
+# library("tidyverse")
 
 
 vcf <- vcfR2genind(read.vcfR("snakemake@input"))
