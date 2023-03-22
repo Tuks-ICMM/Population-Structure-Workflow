@@ -136,7 +136,7 @@ if not len(samples.index) < 50:
 
 
             echo -e "\n--- LOG SECTION START | Plink-2.0 'Perform Principle Component Analysis (PCA)' ---" 1>&2
-            plink2 --vcf {input} --exclude Plink-PCA.prune.out --mac 2 --pca allele-wts vzs scols=sid --out Plink-PCA
+            plink2 --vcf {input} --exclude Plink-PCA.prune.out --mac 2 --pca allele-wts vzs scols=sid --out results/{wildcards.cluster_assignment}/Population_Structure/Plink-PCA
             echo -e "--- LOG SECTION END | Plink-2.0 'Perform Principle Component Analysis (PCA)' ---\n" 1>&2
             """
 
