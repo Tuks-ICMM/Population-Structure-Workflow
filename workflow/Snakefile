@@ -123,14 +123,15 @@ if not len(samples.index) < 50:
         output:
             "results/{cluster_assignment}/Population_Structure/Plink-PCA.prune.in",
             "results/{cluster_assignment}/Population_Structure/Plink-PCA.prune.out",
-            "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec",
-            "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec.allele",
+            "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec",# `--pca` Eigenvectors
+            "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenval",# `--pca` Eigenvalues
+            "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec.alleles.zst", # `--pca` Allele weights
         envmodules:
             config["envmodules"]["Plink-2"],
         shell:
             """
             echo -e "\n--- LOG SECTION START | Plink-2.0 'Filter variants in disequilibrium' ---" 1>&2
-            plink2 --vcf {input} --indep-pairwise 50 5 0.5 --out Plink-PCA
+            plink2 --vcf {input} --indep-pairwise 50 5 0.5 --out results/{wildcards.cluster_assignment}/Population_Structure/Plink-PCA
             echo -e "--- LOG SECTION END | Plink-2.0 'Filter variants in disequilibrium' ---\n" 1>&2
 
 
@@ -213,8 +214,9 @@ if not len(samples.index) < 50:
             [
                 "results/{cluster_assignment}/Population_Structure/Plink-PCA.prune.in",
                 "results/{cluster_assignment}/Population_Structure/Plink-PCA.prune.out",
-                "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec",
-                "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec.allele",
+                "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec",# `--pca` Eigenvectors
+                "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenval",# `--pca` Eigenvalues
+                "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec.alleles.zst", # `--pca` Allele weights
             ],
             cluster_assignment=[
                 grouping_name
