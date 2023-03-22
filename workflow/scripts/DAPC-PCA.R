@@ -21,14 +21,14 @@ table(pop(vcf), grp$grp)
 png(
   filename = sprintf(
     "results/%s/Population_Structure/DAPC_population_inferences.png",
-    snakemake@wildcards["cluster_assignment"]
+    snakemake@wildcards[["cluster_assignment"]]
   ),
   width = 13.3,
   height = 7.5
 )
 table.value(
   table(pop(vcf), grp$grp),
-  col.lab = paste("infer", 1:13)
+  col.lab = paste("infer", 1:length(snakemake@wildcards[["cluster_assignment"]]))
 )
 dev.off()
 
@@ -37,7 +37,7 @@ dapc_results <- dapc(vcf, grp$grp)
 png(
   filename = sprintf(
     "results/%s/Population_Structure/DAPC_scatter_plot.png",
-    snakemake@wildcards["cluster_assignment"]
+    snakemake@wildcards[["cluster_assignment"]]
   ),
   width = 13.3,
   height = 7.5
