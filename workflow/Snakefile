@@ -79,16 +79,16 @@ rule Admixture_v1p3:
 
         echo -e "\n--- LOG SECTION START | Plink-1.9 'Prepare input file forat' ---" 1>&2
 
-        plink --vcf {input} --make-bed --out Admixture_1.3
+        plink --vcf {input} --make-bed --out results/{wildcards.cluster_assignment}/Population_Structure/Admixture_1.3
 
         echo -e "--- LOG SECTION END | Plink-1.9 'Prepare input file forat' ---\n" 1>&2
 
 
 
         echo -e "\n--- LOG SECTION START | Admixture-1.3 'Perform k-means maximum-liklihood group assignment' ---" 1>&2
-
+        cd results/{wildcards.cluster_assignment}/Population_Structure/
         admixture Admixture_1.3.bed {wildcards.k}
-
+        cd ../../..
         echo -e "--- LOG SECTION END | Admixture-1.3 'Perform k-means maximum-liklihood group assignment' ---\n" 1>&2
 
         """
