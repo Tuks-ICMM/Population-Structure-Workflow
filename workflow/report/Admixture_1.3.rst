@@ -5,9 +5,9 @@ Notes:
 ======
 Since this method of population structure introspection is parametric, certain quality control measures have been taken.
 
-----------
+----------------------------
 Minor allele count filtering
-----------
+----------------------------
 Singleton alleles have been removed. After reviewing an interesting discussion on the effects of frequency-based filters on admixture and population structure software, it was found that 
 *singletons* negatively impact model-based methods ability to assign clear population groupings. (`doi.org/10.1111/1755-0998.12995 <https://doi.org/10.1111/1755-0998.12995>`_)
 
