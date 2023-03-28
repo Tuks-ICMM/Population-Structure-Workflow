@@ -141,6 +141,20 @@ if not len(samples.index) < 50:
             echo -e "--- LOG SECTION END | Plink-2.0 'Perform Principle Component Analysis (PCA)' ---\n" 1>&2
             """
 
+    rule Plink2_Graphs:
+        """
+        A rule to graph the PLink-2.0 PCA's results.
+        """
+        input:
+            "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec",# `--pca` Eigenvectors
+            "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenval",# `--pca` Eigenvalues
+        output:
+            "results/{cluster_assignment}/Population_Structure/Plink-PCA.jpeg"
+        envmodules:
+            config["envmodules"]["python"]
+        script:
+            "workflow/scripts/Plink_PCA.py"
+
 
 rule DAPC:
     """
