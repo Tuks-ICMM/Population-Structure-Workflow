@@ -217,7 +217,14 @@ analysis_files.append(
     )
 )
 analysis_files.append(
-    "results/{cluster_assignment}/Population_Structure/Admixture-1.3_Graph.jpeg"
+    expand(
+        "results/{cluster_assignment}/Population_Structure/Admixture-1.3_Graph.jpeg",
+        cluster_assignment=[
+                grouping_name
+                for grouping_name in samples.keys()
+                if grouping_name != "sample_name"
+            ]
+    )
 )
 
 # DAPC
@@ -255,7 +262,14 @@ if not len(samples.index) < 50:
         )
     )
     analysis_files.append(
-        "results/{cluster_assignment}/Population_Structure/Plink-PCA.jpeg"
+        expand(
+            "results/{cluster_assignment}/Population_Structure/Plink-PCA.jpeg",
+            cluster_assignment=[
+                grouping_name
+                for grouping_name in samples.keys()
+                if grouping_name != "sample_name"
+            ]
+        )
     )
 
 rule all:
