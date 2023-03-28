@@ -41,7 +41,7 @@ label_mappings = {"Individual": "Individuals", "variable": "Populations (LTR)"}
 fig = px.histogram(
     data,
     x="Individual",
-    y=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    y=[PC for PC in data.keys() if PC != "Individual"],
     title=f"Admixture-1.3.0 Plot | SUPER",
     template="plotly_dark",
     labels=label_mappings,
