@@ -5,4 +5,4 @@ This document displays a summary of your analyses and its outputs. Each result e
 -------
 Authors
 -------
-The `Population Structure Workflow` is produced by the `Institute for Cellular and Molecular Medicine <https://www.up.ac.za/institute-for-cellular-and-molecular-medicine>`_. Please see our `GitHub page <https://github.com/Tuks-ICMM>`_ and `website<https://www.up.ac.za/institute-for-cellular-and-molecular-medicine>`_ for more information.
+The `Population Structure Workflow` is produced by the `Institute for Cellular and Molecular Medicine <https://www.up.ac.za/institute-for-cellular-and-molecular-medicine>`_. Please see our `GitHub page <https://github.com/Tuks-ICMM>`_ and `website <https://www.up.ac.za/institute-for-cellular-and-molecular-medicine>`_ for more information.
