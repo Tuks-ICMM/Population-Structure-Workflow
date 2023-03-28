@@ -224,11 +224,11 @@ analysis_files.append(
                 for grouping_name in samples.keys()
                 if grouping_name != "sample_name"
             ],
-            k=[len(num_groups.unique()) for num_groups in samples[key] for key in  [
+        k=[len(groups) for groups in [samples[k].unique() for k in  [
                 grouping_name
                 for grouping_name in samples.keys()
                 if grouping_name != "sample_name"
-            ]]
+            ]]]
     )
 )
 
