@@ -102,8 +102,8 @@ rule Admixture_v1p3_Graphs:
     output:
         report(
             "results/{cluster_assignment}/Population_Structure/Admixture-1.3_Graph.{k}.jpeg",
+            category="Population Structure",
             subcategory="{cluster_assignment}",
-            category="Population_Structure",
             caption="report/Admixture_1.3.rst",
             labels={
                 "Library/Software": "[Python] Plotly",
@@ -171,8 +171,8 @@ if not len(samples.index) < 50:
         output:
             report(
                 "results/{cluster_assignment}/Population_Structure/Plink-PCA.jpeg", 
-                subcategory="{cluster_assignment}", 
                 category="Population Structure", 
+                subcategory="{cluster_assignment}", 
                 caption="report/Plink2_PCA.rst",
                 labels={
                     "Library/Software": "[Python] Plotly",
@@ -194,8 +194,8 @@ rule DAPC:
     output:
         report(
             "results/{cluster_assignment}/Population_Structure/DAPC_scatter_plot.png",
-            category="{cluster_assignment}",
-            subcategory="Population Structure",
+            category="Population Structure",
+            subcategory="{cluster_assignment}",
             caption="report/DAPC.rst",
             labels={
                 "Library/Software": "Adegenet",
@@ -204,8 +204,8 @@ rule DAPC:
         ),
         report(
             "results/{cluster_assignment}/Population_Structure/DAPC_population_inferences.png",
-            subcategory="{cluster_assignment}",
             category="Population Structure",
+            subcategory="{cluster_assignment}",
             caption="report/DAPC.rst",
             labels={
                 "Library/Software": "Adegenet",
