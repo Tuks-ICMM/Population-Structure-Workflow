@@ -24,7 +24,7 @@ eigenvalues = pd.read_csv(
     ),
     header=None,
 )
-samples = pd.read_csv(join("..", "..", "input", "samples.csv"))
+samples = pd.read_csv(join("input", "samples.csv"))
 
 vectors = eigenvectors.merge(
     samples, how="left", left_on="#IID", right_on="sample_name", indicator=True
