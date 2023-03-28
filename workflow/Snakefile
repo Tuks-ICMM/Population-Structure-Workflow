@@ -98,7 +98,7 @@ rule Admixture_v1p3_Graphs:
     A rule to produce teh graphs for Admixture-1.3.0.
     """
     input: 
-        expand("results/{{cluster_assignment}}/Population_Structure/Admixture_1.3.{k}.{ext}", k=len(samples[wildcards.cluster_assignment].unique()), ext=["P", "Q"])
+        lambda wildcards: expand("results/{{cluster_assignment}}/Population_Structure/Admixture_1.3.{k}.{ext}", k=len(samples[wildcards.cluster_assignment].unique()), ext=["P", "Q"])
     output:
         report("results/{cluster_assignment}/Population_Structure/Admixture-1.3_Graph.jpeg", category="Population Structure", subcategory="Admixture-1.3", caption="report/Admixture_1.3.rst")
     script:
