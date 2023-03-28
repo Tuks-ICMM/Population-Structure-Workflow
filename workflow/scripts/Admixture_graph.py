@@ -8,7 +8,12 @@ import plotly.express as px
 
 data = (
     pd.read_csv(
-        "../../results/SUPER/Population_Structure/Admixture_1.3.11.Q",
+        join(
+            "results",
+            snakemake.wildcards.cluster_assignment,
+            "Population_Structure",
+            f"Admixture_1.3.{snakemake.wildcards.k}.Q",
+        ),
         sep=" ",
         header=None,
     )
@@ -18,7 +23,9 @@ data = (
     # .groupby("population")
     # .apply(pd.DataFrame.sort_values, "likelihood")
 )
-data.sort_values(by=[PC for PC in data.keys() if PC != 'Individual'], ascending=False, inplace=True)
+data.sort_values(
+    by=[PC for PC in data.keys() if PC != "Individual"], ascending=False, inplace=True
+)
 
 data["Individual"] = (
     data["Individual"].apply(str).apply(lambda value: f"Individual {value}")
