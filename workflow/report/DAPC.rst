@@ -1,5 +1,5 @@
 Discriminant ANalysis of Principle Components (DAPC). 
-====================================
+=====================================================
 
 We have implemented the `R` package, `Adegenet`'s DAPC methods which perform a Post-Hoc test on Principle component analyses.
 

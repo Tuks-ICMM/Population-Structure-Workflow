@@ -1,5 +1,5 @@
 Discriminant ANalysis of Principle Components (DAPC). 
-====================================
+=====================================================
 
 We have implemented the `Admixture-1.3.0` software. `Admixture-1.3.0` uses an unsupervised clustering algorithm to produce cluster assignments which show population assignment based on marker frequency.
 
