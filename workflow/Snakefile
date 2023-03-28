@@ -106,8 +106,9 @@ rule Admixture_v1p3_Graphs:
             subcategory="{cluster_assignment}",
             caption="report/Admixture_1.3.rst",
             labels={
-                "Library/Software": "[Python] Plotly",
-                "Function": "plotly.express.histogram"
+                "Language": "Python",
+                "Library/Software": "Plotly Express",
+                "Function": "histogram()"
             }
             )
     script:
@@ -175,8 +176,9 @@ if not len(samples.index) < 50:
                 subcategory="{cluster_assignment}", 
                 caption="report/Plink2_PCA.rst",
                 labels={
-                    "Library/Software": "[Python] Plotly",
-                    "Function": "plotly.express.scatter"
+                    "Language": "Python",
+                    "Library/Software": "Plotly",
+                    "Function": "scatter()"
                 }
             )
         envmodules:
@@ -198,8 +200,9 @@ rule DAPC:
             subcategory="{cluster_assignment}",
             caption="report/DAPC.rst",
             labels={
+                "Language": "R",
                 "Library/Software": "Adegenet",
-                "Function": "`dapc`"
+                "Function": "dapc()"
             }
         ),
         report(
@@ -208,8 +211,9 @@ rule DAPC:
             subcategory="{cluster_assignment}",
             caption="report/DAPC.rst",
             labels={
+                "Language": "R",
                 "Library/Software": "Adegenet",
-                "Function": "`find.clusters`"
+                "Function": "find.clusters()"
             }
         ),
     envmodules:
