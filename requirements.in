@@ -2,3 +2,5 @@ snakemake
 snakefmt
 pandas
 pygments
+kaleido
+plotly
