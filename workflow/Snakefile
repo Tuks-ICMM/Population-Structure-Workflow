@@ -100,7 +100,16 @@ rule Admixture_v1p3_Graphs:
     input: 
         expand("results/{{cluster_assignment}}/Population_Structure/Admixture_1.3.{{k}}.{ext}", ext=["P", "Q"])
     output:
-        report("results/{cluster_assignment}/Population_Structure/Admixture-1.3_Graph.{k}.jpeg", category="{cluster_assignment}", subcategory="Admixture-1.3", caption="report/Admixture_1.3.rst")
+        report(
+            "results/{cluster_assignment}/Population_Structure/Admixture-1.3_Graph.{k}.jpeg",
+            subcategory="{cluster_assignment}",
+            category="Population_Structure",
+            caption="report/Admixture_1.3.rst",
+            labels={
+                "Library/Software": "[Python] Plotly",
+                "Function": "plotly.express.histogram"
+            }
+            )
     script:
         "scripts/Admixture_graph.py"
 
@@ -160,7 +169,16 @@ if not len(samples.index) < 50:
             "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec",# `--pca` Eigenvectors
             "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenval",# `--pca` Eigenvalues
         output:
-            report("results/{cluster_assignment}/Population_Structure/Plink-PCA.jpeg", category="{cluster_assignment}", subcategory="Plink-2 PCA", caption="report/Plink2_PCA.rst")
+            report(
+                "results/{cluster_assignment}/Population_Structure/Plink-PCA.jpeg", 
+                subcategory="{cluster_assignment}", 
+                category="Population Structure", 
+                caption="report/Plink2_PCA.rst",
+                labels={
+                    "Library/Software": "[Python] Plotly",
+                    "Function": "plotly.express.scatter"
+                }
+            )
         envmodules:
             config["envmodules"]["python"]
         script:
@@ -177,14 +195,22 @@ rule DAPC:
         report(
             "results/{cluster_assignment}/Population_Structure/DAPC_scatter_plot.png",
             category="{cluster_assignment}",
-            subcategory="DAPC",
-            caption="report/DAPC.rst"
+            subcategory="Population Structure",
+            caption="report/DAPC.rst",
+            labels={
+                "Library/Software": "Adegenet",
+                "Function": "`dapc`"
+            }
         ),
         report(
             "results/{cluster_assignment}/Population_Structure/DAPC_population_inferences.png",
-            category="{cluster_assignment}",
-            subcategory="DAPC",
-            caption="report/DAPC.rst"
+            subcategory="{cluster_assignment}",
+            category="Population Structure",
+            caption="report/DAPC.rst",
+            labels={
+                "Library/Software": "Adegenet",
+                "Function": "`find.clusters`"
+            }
         ),
     envmodules:
         config["envmodules"]["R"],
