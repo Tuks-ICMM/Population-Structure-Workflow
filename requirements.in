@@ -1,3 +1,4 @@
 snakemake
 snakefmt
 pandas
+pygments
