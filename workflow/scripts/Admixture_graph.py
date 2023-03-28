@@ -47,6 +47,6 @@ fig = px.histogram(
     labels=label_mappings,
 )
 fig.update_layout(yaxis_title="Population assignment", bargroupgap=0.0, bargap=0.0)
-fig.write_image(snakemake.output)
+fig.write_image(f"{snakemake.output}")
 
 # %%

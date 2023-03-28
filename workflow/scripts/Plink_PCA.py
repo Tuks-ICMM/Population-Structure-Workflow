@@ -1,4 +1,6 @@
 # %%
+from os.path import join
+
 import pandas as pd
 import plotly.express as px
 
@@ -7,7 +9,7 @@ import plotly.express as px
 eigenvectors = pd.read_csv(
     join(
         "results",
-        snakemake.wildcards.cluster_assignment,
+        f"{snakemake.wildcards.cluster_assignment}",
         "Population_Structure",
         "Plink-PCA.eigenvec",
     ),
@@ -16,13 +18,13 @@ eigenvectors = pd.read_csv(
 eigenvalues = pd.read_csv(
     join(
         "results",
-        snakemake.wildcards.cluster_assignment,
+        f"{snakemake.wildcards.cluster_assignment}",
         "Population_Structure",
         "Plink-PCA.eigenval",
     ),
     header=None,
 )
-samples = pd.read_csv("../../input/samples.csv")
+samples = pd.read_csv(join("..", "..", "input", "samples.csv"))
 
 vectors = eigenvectors.merge(
     samples, how="left", left_on="#IID", right_on="sample_name", indicator=True
