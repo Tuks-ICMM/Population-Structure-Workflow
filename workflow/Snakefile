@@ -182,7 +182,7 @@ if not len(samples.index) < 50:
                 }
             )
         envmodules:
-            config["environment"]["envmodules"]["python"]
+            config["environment"]["envmodules"]["python-3"]
         script:
             "scripts/Plink_PCA.py"
 
