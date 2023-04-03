@@ -45,6 +45,22 @@ bExtensions = ["bed", "bim", "fam"]
 tExtensions = ["map", "ped"]
 
 
+rule SymLink:
+    """
+    Create a symbolic link to the input folder when this is used aspart of the Pharmacogenetics workflow.
+    """
+    input:
+        "results/FILTER/ALL_FILTERED.vcf.gz",
+    output:
+        "input/All.vcf.gz",
+    shell:
+        """
+
+        ln -s "$(pwd)/{input}"  {output}
+
+        """
+
+
 rule Admixture_v1p3:
     """
     An imlementation of the Admixture-1.3 software, a parametric maximum-likelihood-based sofwtare for group assignment in population genetics.
@@ -117,57 +133,57 @@ rule Admixture_v1p3_Graphs:
 #         """
 
 # Unfortionately Plink-2.0's PCA requires at least 50 samples in order to run a PCA. If it does not get them, it will error and kill the process otherwise.
-if not len(samples.index) < 50:
-    rule Plink_PCA:
+
+rule Plink_PCA:
+    """
+    An imlementation of the Plink-2.0 softwares variance-standardized relationship-matrix based PCA method.
+    """
+    input:
+        "input/All.vcf.gz",
+    output:
+        "results/{cluster_assignment}/Population_Structure/Plink-PCA.prune.in",
+        "results/{cluster_assignment}/Population_Structure/Plink-PCA.prune.out",
+        "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec",# `--pca` Eigenvectors
+        "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenval",# `--pca` Eigenvalues
+        "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec.allele.zst", # `--pca` Allele weights
+    envmodules:
+        config["environment"]["envmodules"]["plink-2"],
+    shell:
         """
-        An imlementation of the Plink-2.0 softwares variance-standardized relationship-matrix based PCA method.
-        """
-        input:
-            "input/All.vcf.gz",
-        output:
-            "results/{cluster_assignment}/Population_Structure/Plink-PCA.prune.in",
-            "results/{cluster_assignment}/Population_Structure/Plink-PCA.prune.out",
-            "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec",# `--pca` Eigenvectors
-            "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenval",# `--pca` Eigenvalues
-            "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec.allele.zst", # `--pca` Allele weights
-        envmodules:
-            config["environment"]["envmodules"]["plink-2"],
-        shell:
-            """
-            echo -e "\n--- LOG SECTION START | Plink-2.0 'Filter variants in disequilibrium' ---" 1>&2
-            plink2 --vcf {input} --indep-pairwise 50 5 0.5 --out results/{wildcards.cluster_assignment}/Population_Structure/Plink-PCA
-            echo -e "--- LOG SECTION END | Plink-2.0 'Filter variants in disequilibrium' ---\n" 1>&2
+        echo -e "\n--- LOG SECTION START | Plink-2.0 'Filter variants in disequilibrium' ---" 1>&2
+        plink2 --vcf {input} --indep-pairwise 50 5 0.5 --out results/{wildcards.cluster_assignment}/Population_Structure/Plink-PCA
+        echo -e "--- LOG SECTION END | Plink-2.0 'Filter variants in disequilibrium' ---\n" 1>&2
 
 
 
-            echo -e "\n--- LOG SECTION START | Plink-2.0 'Perform Principle Component Analysis (PCA)' ---" 1>&2
-            plink2 --vcf {input} --exclude results/{wildcards.cluster_assignment}/Population_Structure/Plink-PCA.prune.out --mac 2 --pca allele-wts vzs scols=sid --out results/{wildcards.cluster_assignment}/Population_Structure/Plink-PCA
-            echo -e "--- LOG SECTION END | Plink-2.0 'Perform Principle Component Analysis (PCA)' ---\n" 1>&2
-            """
+        echo -e "\n--- LOG SECTION START | Plink-2.0 'Perform Principle Component Analysis (PCA)' ---" 1>&2
+        plink2 --vcf {input} --exclude results/{wildcards.cluster_assignment}/Population_Structure/Plink-PCA.prune.out --mac 2 --pca allele-wts vzs scols=sid --out results/{wildcards.cluster_assignment}/Population_Structure/Plink-PCA
+        echo -e "--- LOG SECTION END | Plink-2.0 'Perform Principle Component Analysis (PCA)' ---\n" 1>&2
+        """
 
-    rule Plink2_Graphs:
-        """
-        A rule to graph the PLink-2.0 PCA's results.
-        """
-        input:
-            "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec",# `--pca` Eigenvectors
-            "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenval",# `--pca` Eigenvalues
-        output:
-            report(
-                "results/{cluster_assignment}/Population_Structure/Plink-PCA.jpeg", 
-                category="Population Structure", 
-                subcategory="{cluster_assignment}", 
-                caption="report/Plink2_PCA.rst",
-                labels={
-                    "Language": "Python",
-                    "Library/Software": "Plotly",
-                    "Function": "scatter()"
-                }
-            )
-        envmodules:
-            config["environment"]["envmodules"]["python-3"]
-        script:
-            "scripts/Plink_PCA.py"
+rule Plink2_Graphs:
+    """
+    A rule to graph the PLink-2.0 PCA's results.
+    """
+    input:
+        "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec",# `--pca` Eigenvectors
+        "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenval",# `--pca` Eigenvalues
+    output:
+        report(
+            "results/{cluster_assignment}/Population_Structure/Plink-PCA.jpeg", 
+            category="Population Structure", 
+            subcategory="{cluster_assignment}", 
+            caption="report/Plink2_PCA.rst",
+            labels={
+                "Language": "Python",
+                "Library/Software": "Plotly",
+                "Function": "scatter()"
+            }
+        )
+    envmodules:
+        config["environment"]["envmodules"]["python-3"]
+    script:
+        "scripts/Plink_PCA.py"
 
 
 rule DAPC:
