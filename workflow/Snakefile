@@ -249,19 +249,14 @@ analysis_files.append(
 )
 
 # DAPC
-analysis_files.append(
-    expand(
-        [
-            "results/{cluster_assignment}/Population_Structure/DAPC_scatter_plot.png",
-            "results/{cluster_assignment}/Population_Structure/DAPC_population_inferences.png",
-        ],
-        cluster_assignment=[
-            grouping_name
-            for grouping_name in samples.keys()
-            if grouping_name != "sample_name"
-        ],
-    )
-)
+for cluster in [sample for sample in samples.keys() if sample != "sample_name"]:
+    if len(unique(samples[cluster])) > 3:
+        analysis_files.append(
+                [
+                    f"results/{cluster}/Population_Structure/DAPC_scatter_plot.png",
+                    f"results/{cluster}/Population_Structure/DAPC_population_inferences.png",
+                ]
+        )
 
 # Plink-2.0 min 50 samples limit or pipeline go boom
 if not len(samples.index) < 50:
