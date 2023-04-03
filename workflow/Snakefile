@@ -250,7 +250,7 @@ analysis_files.append(
 
 # DAPC
 for cluster in [sample for sample in samples.keys() if sample != "sample_name"]:
-    if len(unique(samples[cluster])) > 3:
+    if len(samples[cluster].unique()) > 3:
         analysis_files.append(
                 [
                     f"results/{cluster}/Population_Structure/DAPC_scatter_plot.png",
