@@ -72,8 +72,8 @@ rule Admixture_v1p3:
         "results/{cluster_assignment}/Population_Structure/Admixture_1.3.{k}.P",
         "results/{cluster_assignment}/Population_Structure/Admixture_1.3.{k}.Q",
     envmodules:
-        config["environment"]["envmodules"]["Admixture-1.3"],
-        config["environment"]["envmodules"]["Plink-1.9"],
+        config["environment"]["envmodules"]["admixture-1.3"],
+        config["environment"]["envmodules"]["plink-1.9"],
     shell:
         """
 
@@ -125,7 +125,7 @@ rule Admixture_v1p3_Graphs:
 #     output:
 #         "results/{cluster_assignment}/Population_Structure/STRUCTURE_{cluster}.yes",
 #     envmodules:
-#         config["environment"]["envmodules"]["STRUCTURE"],
+#         config["environment"]["envmodules"]["structure"],
 #     shell:
 #         """
 #         echo -e "\n--- LOG SECTION START | STRUCTURE 'Perform k-means beysian group assignment' ---" 1>&2
@@ -148,7 +148,7 @@ if not len(samples.index) < 50:
             "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenval",# `--pca` Eigenvalues
             "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec.allele.zst", # `--pca` Allele weights
         envmodules:
-            config["environment"]["envmodules"]["Plink-2"],
+            config["environment"]["envmodules"]["plink-2"],
         shell:
             """
             echo -e "\n--- LOG SECTION START | Plink-2.0 'Filter variants in disequilibrium' ---" 1>&2
@@ -217,7 +217,7 @@ rule DAPC:
             }
         ),
     envmodules:
-        config["environment"]["envmodules"]["R"],
+        config["environment"]["envmodules"]["r"],
     params:
         cluster_assignments=lambda wildcards: samples[
             wildcards.cluster_assignment

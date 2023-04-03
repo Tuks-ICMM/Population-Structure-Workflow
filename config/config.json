@@ -53,11 +53,11 @@
             }
         ],
         "envmodules": {
-            "Plink-2": "plink-2",
-            "Plink-1.9": "plink-1.9",
-            "STRUCTURE": "structure-2.3.4",
-            "Admixture-1.3": "admixture-1.3",
-            "R": "R-4.1.3",
+            "plink-2": "plink-2",
+            "plink-1.9": "plink-1.9",
+            "structure": "structure-2.3.4",
+            "admixture-1.3": "admixture-1.3",
+            "r": "R-4.1.3",
             "python": "python-3.8.2"
         }
     }
