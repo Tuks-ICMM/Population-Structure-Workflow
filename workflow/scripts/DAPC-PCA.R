@@ -1,3 +1,5 @@
+print(paste("[ASSUMPTION] Number of clusters: ", length(unique(snakemake@params[["cluster_assignments"]]))))
+
 library("adegenet")
 library("vcfR")
 library("readr")
@@ -27,7 +29,7 @@ png(
 )
 table.value(
   table(pop(vcf), grp$grp),
-  col.lab = paste("infer", 1:length(snakemake@wildcards[["cluster_assignment"]]))
+  col.lab = paste("infer", 1:length(unique(snakemake@params[["cluster_assignments"]])))
 )
 dev.off()
 
