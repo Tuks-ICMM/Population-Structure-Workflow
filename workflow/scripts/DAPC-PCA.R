@@ -1,4 +1,3 @@
-print(paste("[ASSUMPTION] Number of clusters: ", length(unique(snakemake@params[["cluster_assignments"]]))))
 
 library("adegenet")
 library("vcfR")
@@ -10,6 +9,7 @@ vcf <- vcfR2genind(read.vcfR(snakemake@input[[1]]))
 # samples <- read.csv(snakemake@params['samples'])
 pop(vcf) <- as.factor(snakemake@params[["cluster_assignments"]])
 
+print(paste("[ASSUMPTION(find.clusters)] Number of clusters: ", length(unique(snakemake@params[["cluster_assignments"]]))))
 grp <- find.clusters(
   vcf,
   n.clust = length(unique(snakemake@params[["cluster_assignments"]])),
@@ -21,18 +21,24 @@ grp <- find.clusters(
 table(pop(vcf), grp$grp)
 
 
+print(paste("[LOG] Graph to file: ",  sprintf(
+  "results/%s/Population_Structure/DAPC_population_inferences.png",
+  snakemake@wildcards[["cluster_assignment"]]
+)))
 png(
   filename = sprintf(
     "results/%s/Population_Structure/DAPC_population_inferences.png",
     snakemake@wildcards[["cluster_assignment"]]
   )
 )
+print(paste("[ASSUMPTION(table)] Number of clusters: ", length(unique(snakemake@params[["cluster_assignments"]]))))
 table.value(
   table(pop(vcf), grp$grp),
   col.lab = paste("infer", 1:length(unique(snakemake@params[["cluster_assignments"]])))
 )
 dev.off()
 
+print(paste("[ASSUMPTION(DAPC)] Number of clusters: ", length(unique(snakemake@params[["cluster_assignments"]]))))
 dapc_results <- dapc(
   vcf, grp$grp,
   truenames = TRUE,
@@ -46,6 +52,10 @@ dapc_results <- dapc(
   perc.pca = 90,
 )
 
+print(paste("[LOG] Graph to file: ",  sprintf(
+  "results/%s/Population_Structure/DAPC_scatter_plot.png",
+  snakemake@wildcards[["cluster_assignment"]]
+)))
 png(
   filename = sprintf(
     "results/%s/Population_Structure/DAPC_scatter_plot.png",
