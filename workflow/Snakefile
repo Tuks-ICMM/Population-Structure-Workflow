@@ -261,34 +261,35 @@ for cluster in [sample for sample in samples.keys() if sample != "sample_name"]:
         )
 
 # Plink-2.0 min 50 samples limit or pipeline go boom
-if not len(samples.index) < 50:
-    # Plink-2.0
-    analysis_files.append(
-        expand(
-            [
-                "results/{cluster_assignment}/Population_Structure/Plink-PCA.prune.in",
-                "results/{cluster_assignment}/Population_Structure/Plink-PCA.prune.out",
-                "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec",# `--pca` Eigenvectors
-                "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenval",# `--pca` Eigenvalues
-                "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec.allele.zst", # `--pca` Allele weights
-            ],
-            cluster_assignment=[
-                grouping_name
-                for grouping_name in samples.keys()
-                if grouping_name != "sample_name"
-            ],
+for cluster in [sample for sample in samples.keys() if sample != "sample_name"]:
+    if len(samples[cluster].unique()) > 1 and not len(samples.index) < 50:
+        # Plink-2.0
+        analysis_files.append(
+            expand(
+                [
+                    "results/{cluster_assignment}/Population_Structure/Plink-PCA.prune.in",
+                    "results/{cluster_assignment}/Population_Structure/Plink-PCA.prune.out",
+                    "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec",# `--pca` Eigenvectors
+                    "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenval",# `--pca` Eigenvalues
+                    "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec.allele.zst", # `--pca` Allele weights
+                ],
+                cluster_assignment=[
+                    grouping_name
+                    for grouping_name in samples.keys()
+                    if grouping_name != "sample_name"
+                ],
+            )
         )
-    )
-    analysis_files.append(
-        expand(
-            "results/{cluster_assignment}/Population_Structure/Plink-PCA.jpeg",
-            cluster_assignment=[
-                grouping_name
-                for grouping_name in samples.keys()
-                if grouping_name != "sample_name"
-            ]
+        analysis_files.append(
+            expand(
+                "results/{cluster_assignment}/Population_Structure/Plink-PCA.jpeg",
+                cluster_assignment=[
+                    grouping_name
+                    for grouping_name in samples.keys()
+                    if grouping_name != "sample_name"
+                ]
+            )
         )
-    )
 
 rule all:
     """
