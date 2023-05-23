@@ -1,20 +1,18 @@
 ---
-title: Setup
-permalink: /setup
-nav_order: 2
-parent: Quickstart
+title: Quickstart
+layout: page
+permalink: reference-material/quickstart
+nav_order: 1
+parent: Reference material
 ---
 
-# Setup
+# Quickstart
 {: .no_toc }
 
-Configure the _{{ site.title}}_ for execution. A step-by-step guide.
+A quickreference summary of how to obtain a copy of this workflow and prep an environment for analysis.
 {: .fs-6 .fw-300 }
 
-Quickstart
-{: .label }
-
-Configuration
+quickstart
 {: .label }
 
 <details markdown="block">

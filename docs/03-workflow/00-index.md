@@ -1,10 +1,19 @@
 ---
-title: Introduction
-permalink: overview/introduction
-nav_order: 1
+title: Workflow
+permalink: workflow
 layout: page
-parent: Overview
+nav_order: 2
+has_children: true
 ---
+
+# Workflow
+{: .no_toc }
+
+A summary of the workflow itself and its analyses, broken down by topic.
+{: .fs-6 .fw-300 }
+
+Reference Genome Configuration
+{: .label }
 
 # Introduction
 The <i>{{ site.title }}</i> is a pipeline powered by <a href="https://snakemake.readthedocs.io/" target="_blank">Snakemake</a>, a python-based workflow management package. This project has been created with support for PBS-Torque scheduler environments on Linux servers.
