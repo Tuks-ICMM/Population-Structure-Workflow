@@ -50,14 +50,17 @@ rule Admixture_v1p3:
     """
     An imlementation of the Admixture-1.3 software, a parametric maximum-likelihood-based sofwtare for group assignment in population genetics.
     """
+    group: "ADMIXTURE"
+    log: "logs/ADMIXTURE/{cluster}.log",
+    benchmark: "_benchmarks/ADMIXTURE/writeSampleMetadata.benchmark"
+    envmodules:
+        config["environment"]["envmodules"]["admixture-1.3"],
+        config["environment"]["envmodules"]["plink-1.9"],
     input:
         "input/All.vcf.gz",
     output:
         "results/{cluster_assignment}/Population_Structure/Admixture_1.3.{k}.P",
         "results/{cluster_assignment}/Population_Structure/Admixture_1.3.{k}.Q",
-    envmodules:
-        config["environment"]["envmodules"]["admixture-1.3"],
-        config["environment"]["envmodules"]["plink-1.9"],
     shell:
         """
 
@@ -81,6 +84,7 @@ rule Admixture_v1p3_Graphs:
     """
     A rule to produce the graphs for Admixture-1.3.0.
     """
+    group: "ADMIXTURE"
     input: 
         expand("results/{{cluster_assignment}}/Population_Structure/Admixture_1.3.{{k}}.{ext}", ext=["P", "Q"])
     output:
@@ -98,31 +102,14 @@ rule Admixture_v1p3_Graphs:
     script:
         "scripts/Admixture_graph.py"
 
-
-# rule STRUCTURE:
-#     """
-#     An imlementation of the STURCTURE software, a parametric beysian-based sofwtare for group assignment in population genetics.
-#     """
-
-#     input:
-#         "input/All.vcf.gz"
-#     output:
-#         "results/{cluster_assignment}/Population_Structure/STRUCTURE_{cluster}.yes",
-#     envmodules:
-#         config["environment"]["envmodules"]["structure"],
-#     shell:
-#         """
-#         echo -e "\n--- LOG SECTION START | STRUCTURE 'Perform k-means beysian group assignment' ---" 1>&2
-#         structure
-#         echo -e "--- LOG SECTION END | STRUCTURE 'Perform k-means beysian group assignment' ---\n" 1>&2
-#         """
-
 # Unfortionately Plink-2.0's PCA requires at least 50 samples in order to run a PCA. If it does not get them, it will error and kill the process otherwise.
-
 rule Plink_PCA:
     """
     An imlementation of the Plink-2.0 softwares variance-standardized relationship-matrix based PCA method.
     """
+    group: "PCA"
+    envmodules:
+        config["environment"]["envmodules"]["plink-2"],
     input:
         "input/All.vcf.gz",
     output:
@@ -131,8 +118,6 @@ rule Plink_PCA:
         "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec",# `--pca` Eigenvectors
         "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenval",# `--pca` Eigenvalues
         "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec.allele.zst", # `--pca` Allele weights
-    envmodules:
-        config["environment"]["envmodules"]["plink-2"],
     shell:
         """
         echo -e "\n--- LOG SECTION START | Plink-2.0 'Filter variants in disequilibrium' ---" 1>&2
@@ -150,6 +135,9 @@ rule Plink2_Graphs:
     """
     A rule to graph the PLink-2.0 PCA's results.
     """
+    group: "PCA"
+    envmodules:
+        config["environment"]["envmodules"]["python-3"]
     input:
         "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec",# `--pca` Eigenvectors
         "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenval",# `--pca` Eigenvalues
@@ -165,8 +153,6 @@ rule Plink2_Graphs:
                 "Function": "scatter()"
             }
         )
-    envmodules:
-        config["environment"]["envmodules"]["python-3"]
     script:
         "scripts/Plink_PCA.py"
 
@@ -175,6 +161,13 @@ rule DAPC:
     """
     An implpementation of the Discriminant Analysis of Principle Components, an altered framework for solving for discriminate components.
     """
+    group: "DAPC"
+    envmodules:
+        config["environment"]["envmodules"]["r"],
+    params:
+        cluster_assignments=lambda wildcards: samples[
+            wildcards.cluster_assignment
+        ].tolist(),
     input:
         "input/All.vcf.gz",
     output:
@@ -200,12 +193,6 @@ rule DAPC:
                 "Function": "find.clusters()"
             }
         ),
-    envmodules:
-        config["environment"]["envmodules"]["r"],
-    params:
-        cluster_assignments=lambda wildcards: samples[
-            wildcards.cluster_assignment
-        ].tolist(),
     script:
         "scripts/DAPC-PCA.R"
 
