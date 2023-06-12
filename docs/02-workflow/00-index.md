@@ -15,6 +15,8 @@ A summary of the workflow itself and its analyses, broken down by topic.
 Reference Genome Configuration
 {: .label }
 
+---
+
 # Introduction
 The <i>{{ site.title }}</i> is a pipeline powered by <a href="https://snakemake.readthedocs.io/" target="_blank">Snakemake</a>, a python-based workflow management package. This project has been created with support for PBS-Torque scheduler environments on Linux servers.
 
