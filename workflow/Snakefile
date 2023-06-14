@@ -51,8 +51,8 @@ rule Admixture_v1p3:
     An imlementation of the Admixture-1.3 software, a parametric maximum-likelihood-based sofwtare for group assignment in population genetics.
     """
     group: "ADMIXTURE"
-    log: "logs/ADMIXTURE/{cluster}.log",
-    benchmark: "_benchmarks/ADMIXTURE/writeSampleMetadata.benchmark"
+    log: "logs/ADMIXTURE/{cluster_assignment}/Admixture_k_{k}.log",
+    benchmark: "_benchmarks/ADMIXTURE/{cluster_assignment}/Admixture_k_{k}.benchmark"
     envmodules:
         config["environment"]["envmodules"]["admixture-1.3"],
         config["environment"]["envmodules"]["plink-1.9"],
