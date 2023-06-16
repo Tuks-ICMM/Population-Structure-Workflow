@@ -17,7 +17,8 @@ PBS_Headers = [
 
 PBS_Body = [
     "module load python-3.11.3",
-    "cd {};".format(dirname(abspath(__file__))),
+    f"cd {dirname(abspath(__file__))};",
+    f"source {dirname(abspath(__file__))}/venv/bin/activate",
     "snakemake --profile config/PBS-Torque-Profile --use-envmodules --force",
 ]
 
