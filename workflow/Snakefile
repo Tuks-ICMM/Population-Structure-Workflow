@@ -19,6 +19,9 @@ __status__ = "Development"
 # Enforce version check
 min_version("7")
 
+# LD_LIBRARY_PATH is required to inform Python where OpenSSL library files are located. This is included otherwise none of the rules queued on the system will have this variable set.
+envvars:
+    "LD_LIBRARY_PATH"
 
 # IMPORT SAMPLES METADATA
 configfile: join("config", "config.json")
@@ -50,7 +53,6 @@ rule Admixture_v1p3:
     """
     An imlementation of the Admixture-1.3 software, a parametric maximum-likelihood-based sofwtare for group assignment in population genetics.
     """
-    group: "ADMIXTURE"
     log: "logs/ADMIXTURE/{cluster_assignment}/Admixture_k_{k}.log",
     benchmark: "_benchmarks/ADMIXTURE/{cluster_assignment}/Admixture_k_{k}.benchmark"
     envmodules:
@@ -84,7 +86,6 @@ rule Admixture_v1p3_Graphs:
     """
     A rule to produce the graphs for Admixture-1.3.0.
     """
-    group: "ADMIXTURE"
     input: 
         expand("results/{{cluster_assignment}}/Population_Structure/Admixture_1.3.{{k}}.{ext}", ext=["P", "Q"])
     output:
@@ -107,7 +108,6 @@ rule Plink_PCA:
     """
     An imlementation of the Plink-2.0 softwares variance-standardized relationship-matrix based PCA method.
     """
-    group: "PCA"
     envmodules:
         config["environment"]["envmodules"]["plink-2"],
     input:
@@ -135,7 +135,6 @@ rule Plink2_Graphs:
     """
     A rule to graph the PLink-2.0 PCA's results.
     """
-    group: "PCA"
     envmodules:
         config["environment"]["envmodules"]["python-3"]
     input:
@@ -161,7 +160,6 @@ rule DAPC:
     """
     An implpementation of the Discriminant Analysis of Principle Components, an altered framework for solving for discriminate components.
     """
-    group: "DAPC"
     envmodules:
         config["environment"]["envmodules"]["r"],
     params:
