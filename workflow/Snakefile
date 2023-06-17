@@ -282,5 +282,6 @@ rule all:
     """
     Full suite of analyses to describe population structure using both parametric and non-parametric methods.
     """
+    default_target: True
     input:
         analysis_files,
