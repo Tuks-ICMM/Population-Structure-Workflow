@@ -236,14 +236,14 @@ for cluster in [sample for sample in samples.keys() if sample != "sample_name"]:
         )
 
 # DAPC
-for cluster in [sample for sample in samples.keys() if sample != "sample_name"]:
-    if len(samples[cluster].unique()) > 3:
-        analysis_files.append(
-                [
-                    f"results/{cluster}/Population_Structure/DAPC_scatter_plot.png",
-                    f"results/{cluster}/Population_Structure/DAPC_population_inferences.png",
-                ]
-        )
+# for cluster in [sample for sample in samples.keys() if sample != "sample_name"]:
+#     if len(samples[cluster].unique()) > 3:
+#         analysis_files.append(
+#                 [
+#                     f"results/{cluster}/Population_Structure/DAPC_scatter_plot.png",
+#                     f"results/{cluster}/Population_Structure/DAPC_population_inferences.png",
+#                 ]
+#         )
 
 # Plink-2.0 min 50 samples limit or pipeline go boom
 for cluster in [sample for sample in samples.keys() if sample != "sample_name"]:
