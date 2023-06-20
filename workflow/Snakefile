@@ -88,7 +88,7 @@ rule fetchPedLables:
         ped="results/{cluster_assignment}/Population_Structure/plinkPed.ped",
     output:
         "results/{cluster_assignment}/Population_Structure/fetchPedLables.pop"
-    script:
+    notebook:
         join("scripts", "generateInd2pop.py.ipynb")
 
 rule Admixture_v1p3:
