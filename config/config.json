@@ -23,32 +23,29 @@
         },
         "queues": [
             {
-                "queue": "long",
-                "walltime": "900:00:00",
-                "memory": "128G",
-                "cores": "10",
-                "nodes": "1",
-                "rules": [
-                    "all",
-                    "VALIDATE",
-                    "LIFTOVER",
-                    "COLLATE",
-                    "ALL_COLLATE",
-                    "ANNOTATE",
-                    "ADMIXTURE",
-                    "TRIM_AND_NAME"
-                ]
-            },
-            {
                 "queue": "normal",
                 "walltime": "30:00:00",
                 "memory": "128G",
                 "cores": "10",
                 "nodes": "1",
                 "rules": [
-                    "FILTER",
-                    "TRANSPILE_CLUSTERS",
-                    "PLINK"
+                    "Admixture_v1p3",
+                    "Plink_PCA",
+                    "PLINK",
+                    "DAPC"
+                ]
+            },
+            {
+                "queue": "short",
+                "walltime": "00:30:00",
+                "memory": "128G",
+                "cores": "14",
+                "nodes": "1",
+                "rules": [
+                    "plinkPed",
+                    "fetchPedLables",
+                    "Admixture_v1p3_Graphs",
+                    "Plink2_Graphs"
                 ]
             }
         ],

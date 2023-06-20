@@ -48,12 +48,20 @@ bExtensions = ["bed", "bim", "fam"]
 tExtensions = ["map", "ped"]
 
 
+include: "rules/common.py"
+
+
 rule plinkPed:
     """
     A rule to produce a Plink-1.9 text fileset (.ped and .map), one of which (.ped) is needed by Admixture-1.3.0.
     """
     log: 
         notebook="logs/{cluster_assignment}/Population_Structure/plinkPed.log"
+    resources:
+        cpus=search("cores", "plinkPed"),
+        nodes=search("nodes", "plinkPed"),
+        queue=search("queue", "plinkPed"),
+        walltime=search("walltime", "plinkPed"),
     envmodules: config["environment"]["envmodules"]["plink-1.9"]
     input:
         "input/All.vcf.gz"
@@ -68,6 +76,11 @@ rule fetchPedLables:
     """
     A rule to fetch all cluster annotation labels used for Admixture-1.3.0's supervised analysis, and correctly format them for input.
     """
+    resources:
+        cpus=search("cores", "fetchPedLables"),
+        nodes=search("nodes", "fetchPedLables"),
+        queue=search("queue", "fetchPedLables"),
+        walltime=search("walltime", "fetchPedLables"),
     envmodules:
         config["environment"]["envmodules"]["python-3"]
     input:
@@ -84,6 +97,11 @@ rule Admixture_v1p3:
     """
     log: "logs/ADMIXTURE/{cluster_assignment}/Admixture_k_{k}.log",
     benchmark: "_benchmarks/ADMIXTURE/{cluster_assignment}/Admixture_k_{k}.benchmark"
+    resources:
+        cpus=search("cores", "Admixture_v1p3"),
+        nodes=search("nodes", "Admixture_v1p3"),
+        queue=search("queue", "Admixture_v1p3"),
+        walltime=search("walltime", "Admixture_v1p3"),
     envmodules:
         config["environment"]["envmodules"]["admixture-1.3"],
         config["environment"]["envmodules"]["plink-1.9"],
@@ -107,6 +125,11 @@ rule Admixture_v1p3_Graphs:
     """
     A rule to produce the graphs for Admixture-1.3.0.
     """
+    resources:
+        cpus=search("cores", "Admixture_v1p3_Graphs"),
+        nodes=search("nodes", "Admixture_v1p3_Graphs"),
+        queue=search("queue", "Admixture_v1p3_Graphs"),
+        walltime=search("walltime", "Admixture_v1p3_Graphs"),
     input: 
         expand("results/{{cluster_assignment}}/Population_Structure/Admixture_1.3.{{k}}.{ext}", ext=["P", "Q"])
     output:
@@ -131,6 +154,11 @@ rule Plink_PCA:
     """
     envmodules:
         config["environment"]["envmodules"]["plink-2"],
+    resources:
+        cpus=search("cores", "Plink_PCA"),
+        nodes=search("nodes", "Plink_PCA"),
+        queue=search("queue", "Plink_PCA"),
+        walltime=search("walltime", "Plink_PCA"),
     input:
         "input/All.vcf.gz",
     output:
@@ -158,6 +186,11 @@ rule Plink2_Graphs:
     """
     envmodules:
         config["environment"]["envmodules"]["python-3"]
+    resources:
+        cpus=search("cores", "Plink2_Graphs"),
+        nodes=search("nodes", "Plink2_Graphs"),
+        queue=search("queue", "Plink2_Graphs"),
+        walltime=search("walltime", "Plink2_Graphs"),
     input:
         "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec",# `--pca` Eigenvectors
         "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenval",# `--pca` Eigenvalues
@@ -181,6 +214,11 @@ rule DAPC:
     """
     An implpementation of the Discriminant Analysis of Principle Components, an altered framework for solving for discriminate components.
     """
+    resources:
+        cpus=search("cores", "DAPC"),
+        nodes=search("nodes", "DAPC"),
+        queue=search("queue", "DAPC"),
+        walltime=search("walltime", "DAPC"),
     envmodules:
         config["environment"]["envmodules"]["r"],
     params:
