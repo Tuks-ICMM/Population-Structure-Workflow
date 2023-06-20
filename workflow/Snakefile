@@ -56,7 +56,7 @@ rule plinkPed:
     input:
         "input/All.vcf.gz"
     output: 
-        multitext("results/{cluster_assignment}/Population_Structure/plinkPed", ".ped", ".map"),
+        multiext("results/{cluster_assignment}/Population_Structure/plinkPed", ".ped", ".map"),
     shell:
         """
         plink --vcf {input} --keep-allele-order --recode 12 --out results/{wildcards.cluster_assignment}/Population_Structure/plinkPed
