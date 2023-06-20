@@ -72,7 +72,7 @@ rule fetchPedLables:
         samples="input/samples.csv",
         ped="results/{cluster_assignment}/Population_Structure/plinkPed.ped",
     output:
-        expand("results/{clusters}/Population_Structure/fetchPedLables.pop", clusters=cluster_assignments)
+        "results/{cluster_assignment}/Population_Structure/fetchPedLables.pop"
     script:
         join("scripts", "generateInd2pop.ipynb")
 
