@@ -105,21 +105,22 @@ rule Admixture_v1p3:
     envmodules:
         config["environment"]["envmodules"]["admixture-1.3"],
     params:
-        cpus=search("cores", "Admixture_v1p3")
+        cpus=search("cores", "Admixture_v1p3"),
     input:
         mapFile="results/{cluster_assignment}/Population_Structure/plinkPed.ped",
         pedFile="results/{cluster_assignment}/Population_Structure/plinkPed.ped",
         popFile="results/{cluster_assignment}/Population_Structure/plinkPed.pop",
     output:
-        "results/{cluster_assignment}/Population_Structure/plinkPed.{k}.P",
-        "results/{cluster_assignment}/Population_Structure/plinkPed.{k}.Q",
-        "results/{cluster_assignment}/Population_Structure/plinkPed.{k}.Q_bias",
-        "results/{cluster_assignment}/Population_Structure/plinkPed.{k}.Q_se",
+        "results/{cluster_assignment}/Population_Structure/plinkPed.iter_{n}.{k}.P",
+        "results/{cluster_assignment}/Population_Structure/plinkPed.iter_{n}.{k}.Q",
+        "results/{cluster_assignment}/Population_Structure/plinkPed.iter_{n}.{k}.Q_bias",
+        "results/{cluster_assignment}/Population_Structure/plinkPed.iter_{n}.{k}.Q_se",
     shell:
         """
         echo -e "\n--- LOG SECTION START | Admixture-1.3 'Perform supervised k-means maximum-liklihood group assignment' ---" 1>&2
         cd results/{wildcards.cluster_assignment}/Population_Structure/
-        admixture -j{params.cpus} -B --supervised plinkPed.ped {wildcards.k}
+        ln -s plinkPed.ped plinkPed.iter_{n}.ped
+        admixture -j{params.cpus} -B plinkPed.iter_{n}.ped {wildcards.k}
         cd ../../..
         echo -e "--- LOG SECTION END | Admixture-1.3 'Perform supervised k-means maximum-liklihood group assignment' ---\n" 1>&2
         """
@@ -261,13 +262,19 @@ analysis_files = []
 # Admixture-1.3
 for cluster in [sample for sample in samples.keys() if sample != "sample_name"]:
     if len(samples[cluster].unique()) > 1:
+        # [CALCULATE] value of k
+        k = [
+                len(samples[clusters].unique())
+                for clusters in samples.keys()
+                if clusters != "sample_name"
+            ]
         analysis_files.append(
             expand(
                 [
-                    "results/{cluster_assignment}/Population_Structure/plinkPed.{k}.P",
-                    "results/{cluster_assignment}/Population_Structure/plinkPed.{k}.Q",
-                    "results/{cluster_assignment}/Population_Structure/plinkPed.{k}.Q_bias",
-                    "results/{cluster_assignment}/Population_Structure/plinkPed.{k}.Q_se",
+                    "results/{cluster_assignment}/Population_Structure/plinkPed.iter_{n}.{k}.P",
+                    "results/{cluster_assignment}/Population_Structure/plinkPed.iter_{n}.{k}.Q",
+                    "results/{cluster_assignment}/Population_Structure/plinkPed.iter_{n}.{k}.Q_bias",
+                    "results/{cluster_assignment}/Population_Structure/plinkPed.iter_{n}.{k}.Q_se",
                 ],
                 zip,
                 cluster_assignment=[
@@ -275,11 +282,8 @@ for cluster in [sample for sample in samples.keys() if sample != "sample_name"]:
                     for grouping_name in samples.keys()
                     if grouping_name != "sample_name"
                 ],
-                k=[
-                    len(samples[clusters].unique())
-                    for clusters in samples.keys()
-                    if clusters != "sample_name"
-                ],
+                k=list(range(k-2, k+2)) if k > 2 else list(range(1, k+4)),
+                n=list(range(0,5))
             )
         )
         analysis_files.append(
