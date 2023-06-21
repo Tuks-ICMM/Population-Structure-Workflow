@@ -20,8 +20,8 @@ __status__ = "Development"
 min_version("7")
 
 # LD_LIBRARY_PATH is required to inform Python where OpenSSL library files are located. This is included otherwise none of the rules queued on the system will have this variable set.
-envvars:
-    "LD_LIBRARY_PATH"
+# envvars:
+#     "LD_LIBRARY_PATH"
 
 # IMPORT SAMPLES METADATA
 configfile: join("config", "config.json")
@@ -32,7 +32,7 @@ report: "report/template.rst"
 
 
 # IMPORT SAMPLE METADATA
-samples = read_csv(join("input", "samples.csv"), header=0)
+samples = read_csv(join("input", "samples_raw.csv"), header=0)
 
 # SET CLUSTER CATEGORIES
 cluster_assignments = set(
@@ -84,7 +84,7 @@ rule fetchPedLables:
     envmodules:
         config["environment"]["envmodules"]["python-3"]
     input:
-        samples="input/samples.csv",
+        samples="input/samples_raw.csv",
         ped="results/{cluster_assignment}/Population_Structure/plinkPed.ped",
     output:
         "results/{cluster_assignment}/Population_Structure/plinkPed.pop"
@@ -128,31 +128,31 @@ rule Admixture_v1p3:
         echo -e "--- LOG SECTION END | Admixture-1.3 'Perform supervised k-means maximum-liklihood group assignment' ---\n" 1>&2
         """
 
-rule Admixture_v1p3_Graphs:
-    """
-    A rule to produce the graphs for Admixture-1.3.0.
-    """
-    resources:
-        cpus=search("cores", "Admixture_v1p3_Graphs"),
-        nodes=search("nodes", "Admixture_v1p3_Graphs"),
-        queue=search("queue", "Admixture_v1p3_Graphs"),
-        walltime=search("walltime", "Admixture_v1p3_Graphs"),
-    input: 
-        expand("results/{{cluster_assignment}}/Population_Structure/plinkPed.{{k}}.{ext}", ext=["P", "Q", "Q_bias", "Q_se"])
-    output:
-        report(
-            "results/{cluster_assignment}/Population_Structure/Admixture-1.3_Graph.{k}.jpeg",
-            category="Population Structure",
-            subcategory="{cluster_assignment}",
-            caption="report/Admixture_1.3.rst",
-            labels={
-                "Language": "Python",
-                "Library/Software": "Plotly Express",
-                "Function": "histogram()"
-            }
-            )
-    script:
-        "scripts/Admixture_graph.py"
+# rule Admixture_v1p3_Graphs:
+#     """
+#     A rule to produce the graphs for Admixture-1.3.0.
+#     """
+#     resources:
+#         cpus=search("cores", "Admixture_v1p3_Graphs"),
+#         nodes=search("nodes", "Admixture_v1p3_Graphs"),
+#         queue=search("queue", "Admixture_v1p3_Graphs"),
+#         walltime=search("walltime", "Admixture_v1p3_Graphs"),
+#     input: 
+#         expand("results/{{cluster_assignment}}/Population_Structure/plinkPed.{{k}}.{ext}", ext=["P", "Q", "Q_bias", "Q_se"])
+#     output:
+#         report(
+#             "results/{cluster_assignment}/Population_Structure/Admixture-1.3_Graph.{k}.jpeg",
+#             category="Population Structure",
+#             subcategory="{cluster_assignment}",
+#             caption="report/Admixture_1.3.rst",
+#             labels={
+#                 "Language": "Python",
+#                 "Library/Software": "Plotly Express",
+#                 "Function": "histogram()"
+#             }
+#             )
+#     script:
+#         "scripts/Admixture_graph.py"
 
 # Unfortionately Plink-2.0's PCA requires at least 50 samples in order to run a PCA. If it does not get them, it will error and kill the process otherwise.
 rule Plink_PCA:
@@ -271,40 +271,36 @@ for cluster in [sample for sample in samples.keys() if sample != "sample_name"]:
                 for clusters in samples.keys()
                 if clusters != "sample_name"
             ]
+        path = f"results/{cluster}/Population_Structure/plinkPed"
         analysis_files.append(
+            
             expand(
                 [
-                    "results/{cluster_assignment}/Population_Structure/plinkPed.iter_{n}.{k}.P",
-                    "results/{cluster_assignment}/Population_Structure/plinkPed.iter_{n}.{k}.Q",
-                    "results/{cluster_assignment}/Population_Structure/plinkPed.iter_{n}.{k}.Q_bias",
-                    "results/{cluster_assignment}/Population_Structure/plinkPed.iter_{n}.{k}.Q_se",
+                    path + ".iter_{n}.{k}.P",
+                    path + ".iter_{n}.{k}.Q",
+                    path + ".iter_{n}.{k}.Q_bias",
+                    path + ".iter_{n}.{k}.Q_se",
                 ],
-                zip,
-                cluster_assignment=[
-                    grouping_name
-                    for grouping_name in samples.keys()
-                    if grouping_name != "sample_name"
-                ],
-                k=[list(range(e-2, e+3)) if e > 2 else list(range(1, e+5)) for e in k],
-                n=[list(range(0,5)) for i in range(0,len(k))]
+                k=set([item for sublist in [list(range(e-2, e+3)) if e > 2 else list(range(1, e+5)) for e in k] for item in sublist]),
+                n=list(range(0,5))
             )
         )
-        analysis_files.append(
-            expand(
-                "results/{cluster_assignment}/Population_Structure/Admixture-1.3_Graph.{k}.jpeg",
-                zip,
-                cluster_assignment=[
-                        grouping_name
-                        for grouping_name in samples.keys()
-                        if grouping_name != "sample_name"
-                    ],
-                k=[len(groups) for groups in [samples[k].unique() for k in  [
-                        grouping_name
-                        for grouping_name in samples.keys()
-                        if grouping_name != "sample_name"
-                    ]]]
-            )
-        )
+        # analysis_files.append(
+        #     expand(
+        #         "results/{cluster_assignment}/Population_Structure/Admixture-1.3_Graph.{k}.jpeg",
+        #         zip,
+        #         cluster_assignment=[
+        #                 grouping_name
+        #                 for grouping_name in samples.keys()
+        #                 if grouping_name != "sample_name"
+        #             ],
+        #         k=[len(groups) for groups in [samples[k].unique() for k in  [
+        #                 grouping_name
+        #                 for grouping_name in samples.keys()
+        #                 if grouping_name != "sample_name"
+        #             ]]]
+        #     )
+        # )
 
 # DAPC
 # for cluster in [sample for sample in samples.keys() if sample != "sample_name"]:
