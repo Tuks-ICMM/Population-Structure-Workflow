@@ -285,8 +285,8 @@ for cluster in [sample for sample in samples.keys() if sample != "sample_name"]:
                     for grouping_name in samples.keys()
                     if grouping_name != "sample_name"
                 ],
-                k=set([item for sublist in [list(range(e-2, e+3)) if e > 2 else list(range(1, e+5)) for e in k] for item in sublist]),
-                n=list(range(0,5))
+                k=[list(range(e-2, e+3)) if e > 2 else list(range(1, e+5)) for e in k],
+                n=[list(range(0,5)) for i in len(k)]
             )
         )
         analysis_files.append(
