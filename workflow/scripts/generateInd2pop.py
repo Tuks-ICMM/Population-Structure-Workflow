@@ -9,4 +9,4 @@ pedLabels
 output = pedLabels.merge(samples, how="left", right_index=True, left_index=True).fillna("-")
 output
 
-output[[snakemake.wildcards.cluster_assignment]].to_csv(snakemake.output, index=False, header=False)
+output[[snakemake.wildcards.cluster_assignment]].to_csv(f"{snakemake.output}", index=False, header=False)
