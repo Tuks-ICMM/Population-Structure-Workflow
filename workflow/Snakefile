@@ -122,8 +122,10 @@ rule Admixture_v1p3:
         ln -s plinkPed.ped plinkPed.iter_{wildcards.n}.{wildcards.k}.ped
         ln -s plinkPed.map plinkPed.iter_{wildcards.n}.{wildcards.k}.map
         admixture -j{params.cpus} -B plinkPed.iter_{wildcards.n}.{wildcards.k}.ped {wildcards.k}
-        mv plinkPed.iter_{wildcards.n}.{wildcards.k}.{wildcards.k}.ped plinkPed.iter_{wildcards.n}.{wildcards.k}.ped
-        mv plinkPed.iter_{wildcards.n}.{wildcards.k}.{wildcards.k}.map plinkPed.iter_{wildcards.n}.{wildcards.k}.map
+        mv plinkPed.iter_{wildcards.n}.{wildcards.k}.{wildcards.k}.P plinkPed.iter_{wildcards.n}.{wildcards.k}.P
+        mv plinkPed.iter_{wildcards.n}.{wildcards.k}.{wildcards.k}.Q plinkPed.iter_{wildcards.n}.{wildcards.k}.Q
+        mv plinkPed.iter_{wildcards.n}.{wildcards.k}.{wildcards.k}.Q_bias plinkPed.iter_{wildcards.n}.{wildcards.k}.Q_bias
+        mv plinkPed.iter_{wildcards.n}.{wildcards.k}.{wildcards.k}.Q_se plinkPed.iter_{wildcards.n}.{wildcards.k}.Q_se
         rm plinkPed.iter_{wildcards.n}.{wildcards.k}.ped
         rm plinkPed.iter_{wildcards.n}.{wildcards.k}.map
         cd ../../..
