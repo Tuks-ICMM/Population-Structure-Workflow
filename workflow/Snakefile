@@ -122,8 +122,8 @@ rule Admixture_v1p3:
         ln -s plinkPed.ped plinkPed.iter_{wildcards.n}.{wildcards.k}.ped
         ln -s plinkPed.map plinkPed.iter_{wildcards.n}.{wildcards.k}.map
         admixture -j{params.cpus} -B plinkPed.iter_{wildcards.n}.{wildcards.k}.ped {wildcards.k}
-        rm plinkPed.ped plinkPed.iter_{wildcards.n}.{wildcards.k}.ped
-        rm plinkPed.map plinkPed.iter_{wildcards.n}.{wildcards.k}.map
+        rm plinkPed.iter_{wildcards.n}.{wildcards.k}.ped
+        rm plinkPed.iter_{wildcards.n}.{wildcards.k}.map
         cd ../../..
         echo -e "--- LOG SECTION END | Admixture-1.3 'Perform supervised k-means maximum-liklihood group assignment' ---\n" 1>&2
         """
