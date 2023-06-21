@@ -134,7 +134,7 @@ rule Admixture_v1p3_Graphs:
         queue=search("queue", "Admixture_v1p3_Graphs"),
         walltime=search("walltime", "Admixture_v1p3_Graphs"),
     input: 
-        expand("results/{{cluster_assignment}}/Population_Structure/Admixture_1.3.{{k}}.{ext}", ext=["P", "Q"])
+        expand("results/{{cluster_assignment}}/Population_Structure/plinkPed.{{k}}.{ext}", ext=["P", "Q", "Q_bias", "Q_se"])
     output:
         report(
             "results/{cluster_assignment}/Population_Structure/Admixture-1.3_Graph.{k}.jpeg",
