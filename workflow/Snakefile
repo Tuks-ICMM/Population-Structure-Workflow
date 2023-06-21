@@ -119,8 +119,8 @@ rule Admixture_v1p3:
         """
         echo -e "\n--- LOG SECTION START | Admixture-1.3 'Perform supervised k-means maximum-liklihood group assignment' ---" 1>&2
         cd results/{wildcards.cluster_assignment}/Population_Structure/
-        ln -s plinkPed.ped plinkPed.iter_{n}.ped
-        admixture -j{params.cpus} -B plinkPed.iter_{n}.ped {wildcards.k}
+        ln -s plinkPed.ped plinkPed.iter_{wildcards.n}.ped
+        admixture -j{params.cpus} -B plinkPed.iter_{wildcards.n}.ped {wildcards.k}
         cd ../../..
         echo -e "--- LOG SECTION END | Admixture-1.3 'Perform supervised k-means maximum-liklihood group assignment' ---\n" 1>&2
         """
