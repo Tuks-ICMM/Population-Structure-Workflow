@@ -104,7 +104,6 @@ rule Admixture_v1p3:
         walltime=search("walltime", "Admixture_v1p3"),
     envmodules:
         config["environment"]["envmodules"]["admixture-1.3"],
-        config["environment"]["envmodules"]["plink-1.9"],
     params:
         cpus=search("cores", "Admixture_v1p3")
     input:
@@ -118,7 +117,7 @@ rule Admixture_v1p3:
         """
         echo -e "\n--- LOG SECTION START | Admixture-1.3 'Perform supervised k-means maximum-liklihood group assignment' ---" 1>&2
         cd results/{wildcards.cluster_assignment}/Population_Structure/
-        admixture -j{params.cpus} -B --supervised {input.pedFile} {wildcards.k}
+        admixture -j{params.cpus} -B --supervised plinkPed.ped {wildcards.k}
         cd ../../..
         echo -e "--- LOG SECTION END | Admixture-1.3 'Perform supervised k-means maximum-liklihood group assignment' ---\n" 1>&2
         """
