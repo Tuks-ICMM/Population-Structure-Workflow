@@ -12,7 +12,7 @@ data = (
             "results",
             snakemake.wildcards.cluster_assignment,
             "Population_Structure",
-            f"Admixture_1.3.{snakemake.wildcards.k}.Q",
+            f"plinkPed.{snakemake.wildcards.k}.Q",
         ),
         sep=" ",
         header=None,
