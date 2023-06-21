@@ -111,8 +111,10 @@ rule Admixture_v1p3:
         pedFile="results/{cluster_assignment}/Population_Structure/plinkPed.ped",
         popFile="results/{cluster_assignment}/Population_Structure/plinkPed.pop",
     output:
-        "results/{cluster_assignment}/Population_Structure/Admixture_1.3.{k}.P",
-        "results/{cluster_assignment}/Population_Structure/Admixture_1.3.{k}.Q",
+        "results/{cluster_assignment}/Population_Structure/plinkPed.{k}.P",
+        "results/{cluster_assignment}/Population_Structure/plinkPed.{k}.Q",
+        "results/{cluster_assignment}/Population_Structure/plinkPed.{k}.Q_bias",
+        "results/{cluster_assignment}/Population_Structure/plinkPed.{k}.Q_se",
     shell:
         """
         echo -e "\n--- LOG SECTION START | Admixture-1.3 'Perform supervised k-means maximum-liklihood group assignment' ---" 1>&2
