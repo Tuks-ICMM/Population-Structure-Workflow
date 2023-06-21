@@ -122,6 +122,8 @@ rule Admixture_v1p3:
         ln -s plinkPed.ped plinkPed.iter_{wildcards.n}.{wildcards.k}.ped
         ln -s plinkPed.map plinkPed.iter_{wildcards.n}.{wildcards.k}.map
         admixture -j{params.cpus} -B plinkPed.iter_{wildcards.n}.{wildcards.k}.ped {wildcards.k}
+        rm plinkPed.ped plinkPed.iter_{wildcards.n}.{wildcards.k}.ped
+        rm plinkPed.map plinkPed.iter_{wildcards.n}.{wildcards.k}.map
         cd ../../..
         echo -e "--- LOG SECTION END | Admixture-1.3 'Perform supervised k-means maximum-liklihood group assignment' ---\n" 1>&2
         """
@@ -283,7 +285,7 @@ for cluster in [sample for sample in samples.keys() if sample != "sample_name"]:
                     for grouping_name in samples.keys()
                     if grouping_name != "sample_name"
                 ],
-                k=set([item for sublist in [list(range(e-2, e+3)) if e > 3 else list(range(1, e+5)) for e in k] for item in sublist]),
+                k=set([item for sublist in [list(range(e-2, e+3)) if e > 2 else list(range(1, e+5)) for e in k] for item in sublist]),
                 n=list(range(0,5))
             )
         )
