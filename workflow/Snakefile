@@ -1,4 +1,5 @@
-from pandas import read_csv
+from pandas import read_csv, Dataframe
+from itertools import product
 from os.path import join, isfile
 from snakemake.utils import min_version
 from snakemake.io import expand
@@ -32,7 +33,7 @@ report: "report/template.rst"
 
 
 # IMPORT SAMPLE METADATA
-samples = read_csv(join("input", "samples.csv"), header=0)
+samples = read_csv(join("input", "samples_raw.csv"), header=0)
 
 # SET CLUSTER CATEGORIES
 cluster_assignments = set(
@@ -84,7 +85,7 @@ rule fetchPedLables:
     envmodules:
         config["environment"]["envmodules"]["python-3"]
     input:
-        samples="input/samples.csv",
+        samples="input/samples_raw.csv",
         ped="results/{cluster_assignment}/Population_Structure/plinkPed.ped",
     output:
         "results/{cluster_assignment}/Population_Structure/plinkPed.pop"
@@ -275,7 +276,40 @@ for cluster in [sample for sample in samples.keys() if sample != "sample_name"]:
                 for clusters in samples.keys()
                 if clusters != "sample_name"
             ]
+        # [SET] a python `set()` to make sure that any buffer-windows whose ranges overlap
+        # will be collapsed to once for the safe of run-requests and duplicate file names.
+        k_buffer=set(
+            [
+                # [TRANSFORM] Here we walk through two nestings of a list within a list to flatten them into one, flat list.
+                item for sublist in 
+                    # [CALCULATE] the buffer-window around each `k` estimation. Calculation is to check if k hits zero since that does not make biological sense.
+                    [list(range(e-2, e+3)) if e > 2 else list(range(1, e+5)) for e in k]
+                for item in sublist
+            ]
+            )
+        
+        # [SET] The number of iterations to run for each unique `k` estimation in the buffered windows:
+        iterations=list(range(1,6))
+
+        # [SET] The dynamic path for file I/O.
         path = f"results/{cluster}/Population_Structure/plinkPed"
+
+        # [ITERATE] Now we can iterate over the product of the `k_buffer` and `iterations` lists:
+        fileMapRaw = list()
+        for kValue, iteration in product(k_buffer, interations):
+            fileMapRaw.append(
+                [f"k_{kValue|iter_{iteration}",
+                kValue,
+                f"plinkPed.iter_{iterations}.{kValue}.Q"
+                ]
+            )
+        
+        # [CONVERT] convert to a pandas Dataframe for export
+        fileMap = Dataframe(fileMapRaw)
+
+        # [EXPORT] to the output file
+        fileMap.to_csv(path + "plinkPed.filemap", header=0, sep="\t")
+
         analysis_files.append(
             
             expand(
@@ -285,8 +319,8 @@ for cluster in [sample for sample in samples.keys() if sample != "sample_name"]:
                     path + ".iter_{n}.{k}.Q_bias",
                     path + ".iter_{n}.{k}.Q_se",
                 ],
-                k=set([item for sublist in [list(range(e-2, e+3)) if e > 2 else list(range(1, e+5)) for e in k] for item in sublist]),
-                n=list(range(0,5))
+                k=k_buffer,
+                n=iterations
             )
         )
         # analysis_files.append(
