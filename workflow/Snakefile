@@ -298,7 +298,7 @@ for cluster in [sample for sample in samples.keys() if sample != "sample_name"]:
         fileMapRaw = list()
         for kValue, iteration in product(k_buffer, interations):
             fileMapRaw.append(
-                [f"k_{kValue|iter_{iteration}",
+                [f"k_{kValue}|iter_{iteration}",
                 kValue,
                 f"plinkPed.iter_{iterations}.{kValue}.Q"
                 ]
