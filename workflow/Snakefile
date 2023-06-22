@@ -296,7 +296,7 @@ for cluster in [sample for sample in samples.keys() if sample != "sample_name"]:
 
         # [ITERATE] Now we can iterate over the product of the `k_buffer` and `iterations` lists:
         fileMapRaw = list()
-        for kValue, iteration in product(k_buffer, interations):
+        for kValue, iteration in product(k_buffer, iterations):
             fileMapRaw.append(
                 [f"k_{kValue}|iter_{iteration}",
                 kValue,
