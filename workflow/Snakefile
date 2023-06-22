@@ -1,4 +1,4 @@
-from pandas import read_csv, Dataframe
+from pandas import read_csv, DataFrame
 from itertools import product
 from os.path import join, isfile
 from snakemake.utils import min_version
@@ -305,7 +305,7 @@ for cluster in [sample for sample in samples.keys() if sample != "sample_name"]:
             )
         
         # [CONVERT] convert to a pandas Dataframe for export
-        fileMap = Dataframe(fileMapRaw)
+        fileMap = DataFrame(fileMapRaw)
 
         # [EXPORT] to the output file
         fileMap.to_csv(path + "plinkPed.filemap", header=0, sep="\t")
