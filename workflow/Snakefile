@@ -300,7 +300,7 @@ for cluster in [sample for sample in samples.keys() if sample != "sample_name"]:
             fileMapRaw.append(
                 [f"k_{kValue}|iter_{iteration}",
                 kValue,
-                f"plinkPed.iter_{iterations}.{kValue}.Q"
+                f"plinkPed.iter_{iteration}.{kValue}.Q"
                 ]
             )
         
@@ -308,7 +308,7 @@ for cluster in [sample for sample in samples.keys() if sample != "sample_name"]:
         fileMap = DataFrame(fileMapRaw)
 
         # [EXPORT] to the output file
-        fileMap.to_csv(path + "plinkPed.filemap", header=0, sep="\t")
+        fileMap.to_csv(path + ".filemap", header=0, sep="\t")
 
         analysis_files.append(
             
