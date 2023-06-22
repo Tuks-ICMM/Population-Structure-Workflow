@@ -33,7 +33,7 @@ report: "report/template.rst"
 
 
 # IMPORT SAMPLE METADATA
-samples = read_csv(join("input", "samples_raw.csv"), header=0)
+samples = read_csv(join("input", "samples.csv"), header=0)
 
 # SET CLUSTER CATEGORIES
 cluster_assignments = set(
@@ -85,7 +85,7 @@ rule fetchPedLables:
     envmodules:
         config["environment"]["envmodules"]["python-3"]
     input:
-        samples="input/samples_raw.csv",
+        samples="input/samples.csv",
         ped="results/{cluster_assignment}/Population_Structure/plinkPed.ped",
     output:
         "results/{cluster_assignment}/Population_Structure/plinkPed.pop"
