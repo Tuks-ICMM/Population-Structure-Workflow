@@ -308,7 +308,7 @@ for cluster in [sample for sample in samples.keys() if sample != "sample_name"]:
         fileMap = DataFrame(fileMapRaw)
 
         # [EXPORT] to the output file
-        fileMap.to_csv(path + ".filemap", header=0, sep="\t")
+        fileMap.to_csv(path + ".filemap", header=False, sep="\t", index=False)
 
         analysis_files.append(
             
