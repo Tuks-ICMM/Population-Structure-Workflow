@@ -289,7 +289,7 @@ for cluster in [sample for sample in samples.keys() if sample != "sample_name"]:
             )
         
         # [SET] The number of iterations to run for each unique `k` estimation in the buffered windows:
-        iterations=list(range(1,6))
+        iterations=list(range(1,11))
 
         # [SET] The dynamic path for file I/O.
         path = f"results/{cluster}/Population_Structure/plinkPed"
