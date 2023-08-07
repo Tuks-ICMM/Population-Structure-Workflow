@@ -70,7 +70,7 @@ rule plinkPed:
         multiext("results/{cluster_assignment}/Population_Structure/plinkPed", ".ped", ".map"),
     shell:
         """
-        plink --vcf {input} --keep-allele-order --recode 12 --out results/{wildcards.cluster_assignment}/Population_Structure/plinkPed
+        plink --vcf {input} --mac 2 --keep-allele-order --recode 12 --out results/{wildcards.cluster_assignment}/Population_Structure/plinkPed
         """
 
 rule fetchPedLables:
@@ -92,7 +92,7 @@ rule fetchPedLables:
     script:
         join("scripts", "generateInd2pop.py")
 
-rule Admixture_v1p3:
+rule Admixture:
     """
     An imlementation of the Admixture-1.3 software, a parametric maximum-likelihood-based sofwtare for group assignment in population genetics.
     """
@@ -122,7 +122,7 @@ rule Admixture_v1p3:
         cd results/{wildcards.cluster_assignment}/Population_Structure/
         ln -s plinkPed.ped plinkPed.replicate_{wildcards.n}.{wildcards.k}.ped
         ln -s plinkPed.map plinkPed.replicate_{wildcards.n}.{wildcards.k}.map
-        admixture -j{params.cpus} -B plinkPed.replicate_{wildcards.n}.{wildcards.k}.ped {wildcards.k}
+        admixture -j{params.cpus} -B10 plinkPed.replicate_{wildcards.n}.{wildcards.k}.ped {wildcards.k}
         mv plinkPed.replicate_{wildcards.n}.{wildcards.k}.{wildcards.k}.P plinkPed.replicate_{wildcards.n}.{wildcards.k}.P
         mv plinkPed.replicate_{wildcards.n}.{wildcards.k}.{wildcards.k}.Q plinkPed.replicate_{wildcards.n}.{wildcards.k}.Q
         mv plinkPed.replicate_{wildcards.n}.{wildcards.k}.{wildcards.k}.Q_bias plinkPed.replicate_{wildcards.n}.{wildcards.k}.Q_bias
