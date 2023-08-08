@@ -122,7 +122,7 @@ rule Admixture:
         cd results/{wildcards.cluster_assignment}/Population_Structure/
         ln -s plinkPed.ped plinkPed.replicate_{wildcards.n}.{wildcards.k}.ped
         ln -s plinkPed.map plinkPed.replicate_{wildcards.n}.{wildcards.k}.map
-        admixture -j{params.cpus} -B10 plinkPed.replicate_{wildcards.n}.{wildcards.k}.ped {wildcards.k}
+        admixture -j{params.cpus} plinkPed.replicate_{wildcards.n}.{wildcards.k}.ped {wildcards.k}
         mv plinkPed.replicate_{wildcards.n}.{wildcards.k}.{wildcards.k}.P plinkPed.replicate_{wildcards.n}.{wildcards.k}.P
         mv plinkPed.replicate_{wildcards.n}.{wildcards.k}.{wildcards.k}.Q plinkPed.replicate_{wildcards.n}.{wildcards.k}.Q
         mv plinkPed.replicate_{wildcards.n}.{wildcards.k}.{wildcards.k}.Q_bias plinkPed.replicate_{wildcards.n}.{wildcards.k}.Q_bias
