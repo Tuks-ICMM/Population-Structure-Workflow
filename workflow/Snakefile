@@ -114,8 +114,6 @@ rule Admixture:
     output:
         "results/{cluster_assignment}/Population_Structure/plinkPed.replicate_{n}.{k}.P",
         "results/{cluster_assignment}/Population_Structure/plinkPed.replicate_{n}.{k}.Q",
-        "results/{cluster_assignment}/Population_Structure/plinkPed.replicate_{n}.{k}.Q_bias",
-        "results/{cluster_assignment}/Population_Structure/plinkPed.replicate_{n}.{k}.Q_se",
     shell:
         """
         echo -e "\n--- LOG SECTION START | Admixture-1.3 'Perform supervised k-means maximum-liklihood group assignment' ---" 1>&2
@@ -125,8 +123,6 @@ rule Admixture:
         admixture -j{params.cpus} plinkPed.replicate_{wildcards.n}.{wildcards.k}.ped {wildcards.k}
         mv plinkPed.replicate_{wildcards.n}.{wildcards.k}.{wildcards.k}.P plinkPed.replicate_{wildcards.n}.{wildcards.k}.P
         mv plinkPed.replicate_{wildcards.n}.{wildcards.k}.{wildcards.k}.Q plinkPed.replicate_{wildcards.n}.{wildcards.k}.Q
-        mv plinkPed.replicate_{wildcards.n}.{wildcards.k}.{wildcards.k}.Q_bias plinkPed.replicate_{wildcards.n}.{wildcards.k}.Q_bias
-        mv plinkPed.replicate_{wildcards.n}.{wildcards.k}.{wildcards.k}.Q_se plinkPed.replicate_{wildcards.n}.{wildcards.k}.Q_se
         rm plinkPed.replicate_{wildcards.n}.{wildcards.k}.ped
         rm plinkPed.replicate_{wildcards.n}.{wildcards.k}.map
         cd ../../..
@@ -319,8 +315,8 @@ for cluster in [sample for sample in samples.keys() if sample != "sample_name"]:
                 [
                     path + ".replicate_{n}.{k}.P",
                     path + ".replicate_{n}.{k}.Q",
-                    path + ".replicate_{n}.{k}.Q_bias",
-                    path + ".replicate_{n}.{k}.Q_se",
+                    # path + ".replicate_{n}.{k}.Q_bias",
+                    # path + ".replicate_{n}.{k}.Q_se",
                 ],
                 k=k_buffer,
                 n=replicates
