@@ -271,9 +271,9 @@ for cluster in [sample for sample in samples.keys() if sample != "sample_name"]:
     if k > 5:
         # [SET] a python `set()` to make sure that any buffer-windows whose ranges overlap
         # will be collapsed to once for the safe of run-requests and duplicate file names.
-        k_buffer=range(k-5,k+5)
+        k_buffer=range(k-5,k+6)
     else:
-        k_buffer=list(range(1,k+5))
+        k_buffer=list(range(1,k+6))
         
         
     # [SET] The number of iterations to run for each unique `k` estimation in the buffered windows:
