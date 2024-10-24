@@ -29,7 +29,7 @@ report: "report/template.rst"
 
 include: "rules/common.smk"
 
-# IMPORT SAMPLE METADATA
+# IMPORT METADATA
 locations = read_csv(join("input", "locations.csv"), header=0)
 samples = read_csv(join("input", "samples.csv"), header=0)
 
@@ -47,9 +47,9 @@ bExtensions = ["bed", "bim", "fam"]
 tExtensions = ["map", "ped"]
 
 
-rule extract_provided_coordinates:
-    log: outputDir("tmp/{location}/extracted_provided_coordinates.log"),
-    benchmark: outputDir("tmp/{location}/extracted_provided_coordinates.benchmark")
+rule extract_provided_region:
+    log: outputDir("tmp/{location}/extract_provided_region.log"),
+    benchmark: outputDir("tmp/{location}/extract_provided_region.benchmark")
     wildcard_constraints:
         location=r"[a-zA-Z0-9\-]+"
     params:
@@ -63,9 +63,9 @@ rule extract_provided_coordinates:
         pvar=lambda wildcards: outputDir(f"tmp/{locations.loc[locations["location_name"] == wildcards.location, "chromosome"].item()}/removed_related_samples.pvar.zst"),
         psam=lambda wildcards: outputDir(f"tmp/{locations.loc[locations["location_name"] == wildcards.location, "chromosome"].item()}/removed_related_samples.psam"),
     output:
-        pgen=outputDir("tmp/{location}/extracted_provided_coordinates.pgen"),
-        pvar=outputDir("tmp/{location}/extracted_provided_coordinates.pvar.zst"),
-        psam=outputDir("tmp/{location}/extracted_provided_coordinates.psam"),
+        pgen=outputDir("tmp/{location}/extract_provided_region.pgen"),
+        pvar=outputDir("tmp/{location}/extract_provided_region.pvar.zst"),
+        psam=outputDir("tmp/{location}/extract_provided_region.psam"),
     threads: workflow.cores * 0.25
     shell:
         """
@@ -87,9 +87,9 @@ rule remove_rare_variants:
         psam=outputDir("tmp/{contig}/removed_related_samples.psam"),
         sample_metadata=outputDir("tmp/formatted_sample_metadata/samples.tsv")
     output:
-        pgen=outputDir("tmp/{contig}/extracted_provided_coordinates.pgen"),
-        pvar=outputDir("tmp/{contig}/extracted_provided_coordinates.pvar.zst"),
-        psam=outputDir("tmp/{contig}/extracted_provided_coordinates.psam"),
+        pgen=outputDir("tmp/{contig}/extract_provided_region.pgen"),
+        pvar=outputDir("tmp/{contig}/extract_provided_region.pvar.zst"),
+        psam=outputDir("tmp/{contig}/extract_provided_region.psam"),
     threads: workflow.cores * 0.25
     shell:
         """
