@@ -30,6 +30,7 @@ report: "report/template.rst"
 include: "rules/common.smk"
 
 # IMPORT SAMPLE METADATA
+locations = read_csv(join("input", "locations.csv"), header=0)
 samples = read_csv(join("input", "samples.csv"), header=0)
 
 # SET CLUSTER CATEGORIES
