@@ -7,6 +7,3 @@ def outputDir(path: str) -> str:
         return join(OUTPUT_DIR_PATH, path)
     else:
         return join("results", path)
-
-def population_structure_outputs(wildcards):
-    return []
