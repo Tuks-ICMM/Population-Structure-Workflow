@@ -153,4 +153,6 @@ rule all:
     """
     default_target: True
     input:
-        population_structure_outputs
+        expand(outputDir("generate_pca/{location}/pca.eigenvec"), location=locations["location_name"]),
+        expand(outputDir("generate_pca/{location}/pca.eigenvec.allele"), location=locations["location_name"]),
+        expand(outputDir("generate_pca/{location}/pca.eigenval"), location=locations["location_name"])
