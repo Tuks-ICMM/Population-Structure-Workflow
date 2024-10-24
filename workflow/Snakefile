@@ -82,14 +82,14 @@ rule remove_rare_variants:
         input=lambda wildcards, input: input["pgen"].replace('.pgen', ""),
         output=lambda wildcards, output: output["pgen"].replace(".pgen", ""),
     input:
-        pgen=outputDir("tmp/{contig}/removed_related_samples.pgen"),
-        pvar=outputDir("tmp/{contig}/removed_related_samples.pvar.zst"),
-        psam=outputDir("tmp/{contig}/removed_related_samples.psam"),
-        sample_metadata=outputDir("tmp/formatted_sample_metadata/samples.tsv")
-    output:
         pgen=outputDir("tmp/{contig}/extract_provided_region.pgen"),
         pvar=outputDir("tmp/{contig}/extract_provided_region.pvar.zst"),
         psam=outputDir("tmp/{contig}/extract_provided_region.psam"),
+        sample_metadata=outputDir("tmp/formatted_sample_metadata/samples.tsv")
+    output:
+        pgen=outputDir("tmp/{contig}/removed_rare_variants.pgen"),
+        pvar=outputDir("tmp/{contig}/removed_rare_variants.pvar.zst"),
+        psam=outputDir("tmp/{contig}/removed_rare_variants.psam"),
     threads: workflow.cores * 0.25
     shell:
         """
