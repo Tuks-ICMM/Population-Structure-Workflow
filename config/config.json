@@ -13,49 +13,10 @@
             ]
         }
     ],
-    "environment": {
-        "email": {
-            "address": "graeme.ford@tuks.co.za",
-            "conditions": [
-                "o",
-                "e"
-            ]
-        },
-        "queues": [
-            {
-                "queue": "normal",
-                "walltime": "30:00:00",
-                "memory": "128G",
-                "cores": "10",
-                "nodes": "1",
-                "rules": [
-                    "Admixture_v1p3",
-                    "Plink_PCA",
-                    "PLINK",
-                    "DAPC"
-                ]
-            },
-            {
-                "queue": "short",
-                "walltime": "00:30:00",
-                "memory": "128G",
-                "cores": "14",
-                "nodes": "1",
-                "rules": [
-                    "plinkPed",
-                    "fetchPedLables",
-                    "Admixture_v1p3_Graphs",
-                    "Plink2_Graphs"
-                ]
-            }
-        ],
-        "envmodules": {
-            "plink-2": "plink-2",
-            "plink-1.9": "plink-1.9",
-            "structure": "structure-2.3.4",
-            "admixture-1.3": "admixture-1.3.0",
-            "r": "R-4.1.3",
-            "python-3": "python-3.11.3"
-        }
-    }
+    "output-dir": [
+        "/",
+        "mnt",
+        "ICMM_HDD_12TB",
+        "Results_25SEP2024"
+    ]
 }
