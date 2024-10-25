@@ -31,6 +31,7 @@ Reference Genome Configuration
 <details>
   <summary>Rule Map/Diagram</summary>
 
+
   ```mermaid
 ---
 title: Population Structure Workflow
@@ -63,5 +64,6 @@ Perform a PLINK-2.0 PCA]]
 
   plinkPca & report_fixation_index_per_cluster --> END
   ```
+
 
 </details>
