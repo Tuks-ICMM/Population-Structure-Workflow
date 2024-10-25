@@ -31,8 +31,12 @@ Reference Genome Configuration
 <details>
   <summary>Rule Map/Diagram</summary>
 
-```mermaid
+  ```mermaid
+---
+title: Population Structure Workflow
+---
 flowchart TB
+
   classDef bcftools stroke:#FF5733,fill:#D3D3D3,stroke-width:4px,color:black;
   classDef plink stroke:#36454F,fill:#D3D3D3,stroke-width:4px,color:black;
   classDef python stroke:#FEBE10,fill:#D3D3D3,stroke-width:4px,color:black;
@@ -58,6 +62,6 @@ Perform a PLINK-2.0 PCA]]
   START --> extract_provided_region --> remove_rare_variants --> plinkPca & report_fixation_index_per_cluster
 
   plinkPca & report_fixation_index_per_cluster --> END
-```
+  ```
 
 </details>
