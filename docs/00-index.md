@@ -10,7 +10,7 @@ nav_order: 1
 
 <!-- START - Links, Badges and Markdown Variables -->
 <div>
-    <img src="https://github.com/Tuks-ICMM/Pharmacogenetic-Analysis-Pipeline/actions/workflows/snakemake-tests.yml/badge.svg"
+    <img src="https://github.com/Tuks-ICMM/Population-Structure-Workflow/actions/workflows/snakemake-tests.yml/badge.svg"
         alt="Build status badge" />
 </div>
 <div>
