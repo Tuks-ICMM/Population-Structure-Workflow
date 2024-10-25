@@ -24,7 +24,7 @@ email: graeme.ford@tuks.co.za
 description: >- # this means to ignore newlines until "domain:"
   A computational pipeline to analyse human variant-call data and perform variant-effect-prediction
 domain: "tuks-icmm.github.io"
-baseurl: "/Pharmacogenetic-Analysis-Pipeline" # the subpath of your site, e.g. /blog
+baseurl: "/Population-Structure-Workflow" # the subpath of your site, e.g. /blog
 url: "https://tuks-icmm.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 github_username: G-Kodes
 
@@ -45,7 +45,7 @@ color_scheme: "dark"
 
 aux_links:
   "GitHub":
-    - "https://github.com/Tuks-ICMM/Pharmacogenetic-Analysis-Pipeline"
+    - "https://github.com/Tuks-ICMM/Population-Structure-Workflow"
   "ICMM":
     - "https://www.up.ac.za/institute-for-cellular-and-molecular-medicine"
 aux_links_new_tab: true
@@ -66,7 +66,7 @@ callouts:
 # Footer "Edit this page on GitHub" link text
 gh_edit_link: true # show or hide edit this page link
 gh_edit_link_text: "View this page on GitHub."
-gh_edit_repository: "https://github.com/Tuks-ICMM/Pharmacogenetic-Analysis-Pipeline" # the github URL for your repo
+gh_edit_repository: "https://github.com/Tuks-ICMM/Population-Structure-Workflow" # the github URL for your repo
 gh_edit_branch: "main" # the branch that your docs is served from
 gh_edit_source: docs # the source that your files originate from
 gh_edit_view_mode: "tree" # "tree" or "edit" if you want the user to jump into the editor immediately
