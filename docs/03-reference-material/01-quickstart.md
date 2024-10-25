@@ -29,22 +29,22 @@ quickstart
 1. First you will need to download a copy of the pipeline to a location where you can configure and execute it. Navigate to our GitHub repository and retrieve the latest tag information.
 2. Next, you can use `GIT` to clone a copy of the pipeline to your working environment:
     ```bash
-    git clone https://github.com/Tuks-ICMM/Pharmacogenetic-Analysis-Pipeline/releases/tag/{{TAG_VERSION_HERE}} .
+    git clone https://github.com/Tuks-ICMM/Population-Structure-Workflow/releases/tag/{{TAG_VERSION_HERE}} .
     ```
 
     {: .normal }
-    > Tags are available on our GitHub repository under the [releases](https://github.com/Tuks-ICMM/Pharmacogenetic-Analysis-Pipeline/releases) page.
+    > Tags are available on our GitHub repository under the [releases](https://github.com/Tuks-ICMM/Population-Structure-Workflow/releases) page.
 
 ## Prepare data and Metadata
 1. In order to execute the _{{ site.title }}_, you will need to configure the pipeline as well as provide information about the analysis you wish to perform. This involves the following configuration files:
-    - `config/config.json` ([General configuration](https://tuks-icmm.github.io/Pharmacogenetic-Analysis-Pipeline/overview/configuration#setting-global-configuration))
-    - `input/datasets.csv` ([Dataset declarations](https://tuks-icmm.github.io/Pharmacogenetic-Analysis-Pipeline/overview/data-requirements#datasets--dataset-files))
-    - `input/samples.csv` ([Sample metadata](https://tuks-icmm.github.io/Pharmacogenetic-Analysis-Pipeline/overview/data-requirements#samples))
-    - `input/locations.csv` ([Genomic location metadata](https://tuks-icmm.github.io/Pharmacogenetic-Analysis-Pipeline/overview/data-requirements#genomic-locations))
-    - `input/transcripts.csv` ([Transcript selection](https://tuks-icmm.github.io/Pharmacogenetic-Analysis-Pipeline/overview/data-requirements#samples))
+    - `config/config.json` ([General configuration](https://tuks-icmm.github.io/Population-Structure-Workflow/overview/configuration#setting-global-configuration))
+    - `input/datasets.csv` ([Dataset declarations](https://tuks-icmm.github.io/Population-Structure-Workflow/overview/data-requirements#datasets--dataset-files))
+    - `input/samples.csv` ([Sample metadata](https://tuks-icmm.github.io/Population-Structure-Workflow/overview/data-requirements#samples))
+    - `input/locations.csv` ([Genomic location metadata](https://tuks-icmm.github.io/Population-Structure-Workflow/overview/data-requirements#genomic-locations))
+    - `input/transcripts.csv` ([Transcript selection](https://tuks-icmm.github.io/Population-Structure-Workflow/overview/data-requirements#samples))
 2. Following configuration, you will need to provide the input data files themselves.
-    - `.vcf.gz` files can be compressed but must be accompanied by a tabix index file ([Discussion here](https://tuks-icmm.github.io/Pharmacogenetic-Analysis-Pipeline/overview/data-requirements#compression-and-indexing))
-    - `.fasta.gz` files for reference sequences must be accompanied by a sequence dictionary file (`.dict`), a fasta index file (`.fa.gz.fai` or `fasta.gz.fai`) and a BGZIP-index (`.fa.gz.gzi`) ([Discussion here](https://tuks-icmm.github.io/Pharmacogenetic-Analysis-Pipeline/overview/configuration#reference-genomes)).
+    - `.vcf.gz` files can be compressed but must be accompanied by a tabix index file ([Discussion here](https://tuks-icmm.github.io/Population-Structure-Workflow/overview/data-requirements#compression-and-indexing))
+    - `.fasta.gz` files for reference sequences must be accompanied by a sequence dictionary file (`.dict`), a fasta index file (`.fa.gz.fai` or `fasta.gz.fai`) and a BGZIP-index (`.fa.gz.gzi`) ([Discussion here](https://tuks-icmm.github.io/Population-Structure-Workflow/overview/configuration#reference-genomes)).
 
 ## Execute analysis
 1. To execute the analysis, we need to compile our metadata and auto-generate a suitable queue-able script for the batch scheduler. To do this, you can use the `run.py` script which generates and queues a hidden generated script `.run.sh` written for your environment. For example:

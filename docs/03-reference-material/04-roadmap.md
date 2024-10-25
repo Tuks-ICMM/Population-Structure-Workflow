@@ -27,7 +27,7 @@ Changelog
 ---
 
 # Roadmap
-See our [Issues tracker](https://github.com/Tuks-ICMM/Pharmacogenetic-Analysis-Pipeline/issues) on GitHub for a list of proposed features (and known issues).
+See our [Issues tracker](https://github.com/Tuks-ICMM/Population-Structure-Workflow/issues) on GitHub for a list of proposed features (and known issues).
 
 <dl>
     <dt>Q1-Q2 2023</dt>
