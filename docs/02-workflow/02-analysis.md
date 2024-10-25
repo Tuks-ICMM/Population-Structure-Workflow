@@ -28,7 +28,7 @@ Reference Genome Configuration
 
 ---
 
-<details open>
+<details open markdown="block">
   <summary>Rule Map/Diagram</summary>
 
 
