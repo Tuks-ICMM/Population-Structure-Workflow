@@ -20,10 +20,6 @@ __status__ = "Development"
 # Enforce version check
 min_version("7")
 
-# LD_LIBRARY_PATH is required to inform Python where OpenSSL library files are located. This is included otherwise none of the rules queued on the system will have this variable set.
-# envvars:
-#     "LD_LIBRARY_PATH"
-
 # IMPORT SAMPLES METADATA
 configfile: join("config", "config.json")
 
@@ -31,8 +27,10 @@ configfile: join("config", "config.json")
 # SET REPORT TEMPLATE
 report: "report/template.rst"
 
+include: "rules/common.smk"
 
-# IMPORT SAMPLE METADATA
+# IMPORT METADATA
+locations = read_csv(join("input", "locations.csv"), header=0)
 samples = read_csv(join("input", "samples.csv"), header=0)
 
 # SET CLUSTER CATEGORIES
@@ -49,328 +47,106 @@ bExtensions = ["bed", "bim", "fam"]
 tExtensions = ["map", "ped"]
 
 
-include: "rules/common.py"
-
-
-rule plinkPed:
-    """
-    A rule to produce a Plink-1.9 text fileset (.ped and .map), one of which (.ped) is needed by Admixture-1.3.0.
-    """
-    log: 
-        notebook="logs/{cluster_assignment}/Population_Structure/plinkPed.log"
-    resources:
-        cpus=search("cores", "plinkPed"),
-        nodes=search("nodes", "plinkPed"),
-        queue=search("queue", "plinkPed"),
-        walltime=search("walltime", "plinkPed"),
-    envmodules: config["environment"]["envmodules"]["plink-1.9"]
-    input:
-        "input/All.vcf.gz"
-    output:
-        multiext("results/{cluster_assignment}/Population_Structure/plinkPed", ".ped", ".map"),
-    shell:
-        """
-        plink --vcf {input} --mac 2 --keep-allele-order --recode 12 --out results/{wildcards.cluster_assignment}/Population_Structure/plinkPed
-        """
-
-rule fetchPedLables:
-    """
-    A rule to fetch all cluster annotation labels used for Admixture-1.3.0's supervised analysis, and correctly format them for input.
-    """
-    resources:
-        cpus=search("cores", "fetchPedLables"),
-        nodes=search("nodes", "fetchPedLables"),
-        queue=search("queue", "fetchPedLables"),
-        walltime=search("walltime", "fetchPedLables"),
-    envmodules:
-        config["environment"]["envmodules"]["python-3"]
-    input:
-        samples="input/samples.csv",
-        ped="results/{cluster_assignment}/Population_Structure/plinkPed.ped",
-    output:
-        "results/{cluster_assignment}/Population_Structure/plinkPed.pop"
-    script:
-        join("scripts", "generateInd2pop.py")
-
-rule Admixture:
-    """
-    An imlementation of the Admixture-1.3 software, a parametric maximum-likelihood-based sofwtare for group assignment in population genetics.
-    """
-    log: "logs/ADMIXTURE/{cluster_assignment}/Admixture.replicate_{n}.{k}.log",
-    benchmark: "_benchmarks/ADMIXTURE/{cluster_assignment}/Admixture.replicate_{n}.{k}.benchmark"
-    resources:
-        cpus=search("cores", "Admixture_v1p3"),
-        nodes=search("nodes", "Admixture_v1p3"),
-        queue=search("queue", "Admixture_v1p3"),
-        walltime=search("walltime", "Admixture_v1p3"),
-    envmodules:
-        config["environment"]["envmodules"]["admixture-1.3"],
+rule extract_provided_region:
+    log: outputDir("tmp/{location}/extract_provided_region.log"),
+    benchmark: outputDir("tmp/{location}/extract_provided_region.benchmark")
+    wildcard_constraints:
+        location=r"[a-zA-Z0-9\-]+"
     params:
-        cpus=search("cores", "Admixture_v1p3"),
+        fromBP=lambda wildcards: locations.loc[locations["location_name"] == wildcards.location, "ld_start"].item(),
+        toBP=lambda wildcards: locations.loc[locations["location_name"] == wildcards.location, "ld_stop"].item(),
+        chr=lambda wildcards: locations.loc[locations["location_name"] == wildcards.location, "chromosome"].item(),
+        input=lambda wildcards, input: input["pgen"].replace('.pgen', ""),
+        output=lambda wildcards, output: output["pgen"].replace(".pgen", ""),
     input:
-        mapFile="results/{cluster_assignment}/Population_Structure/plinkPed.map",
-        pedFile="results/{cluster_assignment}/Population_Structure/plinkPed.ped",
-        popFile="results/{cluster_assignment}/Population_Structure/plinkPed.pop",
+        pgen=lambda wildcards: outputDir(f"tmp/{locations.loc[locations["location_name"] == wildcards.location, "chromosome"].item()}/removed_related_samples.pgen"),
+        pvar=lambda wildcards: outputDir(f"tmp/{locations.loc[locations["location_name"] == wildcards.location, "chromosome"].item()}/removed_related_samples.pvar.zst"),
+        psam=lambda wildcards: outputDir(f"tmp/{locations.loc[locations["location_name"] == wildcards.location, "chromosome"].item()}/removed_related_samples.psam"),
     output:
-        "results/{cluster_assignment}/Population_Structure/plinkPed.replicate_{n}.{k}.P",
-        "results/{cluster_assignment}/Population_Structure/plinkPed.replicate_{n}.{k}.Q",
+        pgen=outputDir("tmp/{location}/extract_provided_region.pgen"),
+        pvar=outputDir("tmp/{location}/extract_provided_region.pvar.zst"),
+        psam=outputDir("tmp/{location}/extract_provided_region.psam"),
+    threads: workflow.cores * 0.25
     shell:
         """
-        echo -e "\n--- LOG SECTION START | Admixture-1.3 'Perform supervised k-means maximum-liklihood group assignment' ---" 1>&2
-        cd results/{wildcards.cluster_assignment}/Population_Structure/
-        ln -s plinkPed.ped plinkPed.replicate_{wildcards.n}.{wildcards.k}.ped
-        ln -s plinkPed.map plinkPed.replicate_{wildcards.n}.{wildcards.k}.map
-        admixture -j{params.cpus} plinkPed.replicate_{wildcards.n}.{wildcards.k}.ped {wildcards.k}
-        mv plinkPed.replicate_{wildcards.n}.{wildcards.k}.{wildcards.k}.P plinkPed.replicate_{wildcards.n}.{wildcards.k}.P
-        mv plinkPed.replicate_{wildcards.n}.{wildcards.k}.{wildcards.k}.Q plinkPed.replicate_{wildcards.n}.{wildcards.k}.Q
-        rm plinkPed.replicate_{wildcards.n}.{wildcards.k}.ped
-        rm plinkPed.replicate_{wildcards.n}.{wildcards.k}.map
-        cd ../../..
-        echo -e "--- LOG SECTION END | Admixture-1.3 'Perform supervised k-means maximum-liklihood group assignment' ---\n" 1>&2
+        plink2 --threads {threads} --pfile {params.input} vzs --from-bp {params.fromBP} --to-bp {params.toBP} --chr {params.chr} --make-pgen vzs --out {params.output} >{log} 2>&1
         """
 
-# rule Admixture_v1p3_Graphs:
-#     """
-#     A rule to produce the graphs for Admixture-1.3.0.
-#     """
-#     resources:
-#         cpus=search("cores", "Admixture_v1p3_Graphs"),
-#         nodes=search("nodes", "Admixture_v1p3_Graphs"),
-#         queue=search("queue", "Admixture_v1p3_Graphs"),
-#         walltime=search("walltime", "Admixture_v1p3_Graphs"),
-#     input: 
-#         expand("results/{{cluster_assignment}}/Population_Structure/plinkPed.{{k}}.{ext}", ext=["P", "Q", "Q_bias", "Q_se"])
-#     output:
-#         report(
-#             "results/{cluster_assignment}/Population_Structure/Admixture-1.3_Graph.{k}.jpeg",
-#             category="Population Structure",
-#             subcategory="{cluster_assignment}",
-#             caption="report/Admixture_1.3.rst",
-#             labels={
-#                 "Language": "Python",
-#                 "Library/Software": "Plotly Express",
-#                 "Function": "histogram()"
-#             }
-#             )
-#     script:
-#         "scripts/Admixture_graph.py"
 
-# Unfortionately Plink-2.0's PCA requires at least 50 samples in order to run a PCA. If it does not get them, it will error and kill the process otherwise.
-rule Plink_PCA:
-    """
-    An imlementation of the Plink-2.0 softwares variance-standardized relationship-matrix based PCA method.
-    """
-    envmodules:
-        config["environment"]["envmodules"]["plink-2"],
-    resources:
-        cpus=search("cores", "Plink_PCA"),
-        nodes=search("nodes", "Plink_PCA"),
-        queue=search("queue", "Plink_PCA"),
-        walltime=search("walltime", "Plink_PCA"),
-    input:
-        "input/All.vcf.gz",
-    output:
-        "results/{cluster_assignment}/Population_Structure/Plink-PCA.prune.in",
-        "results/{cluster_assignment}/Population_Structure/Plink-PCA.prune.out",
-        "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec",# `--pca` Eigenvectors
-        "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenval",# `--pca` Eigenvalues
-        "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec.allele.zst", # `--pca` Allele weights
-    shell:
-        """
-        echo -e "\n--- LOG SECTION START | Plink-2.0 'Filter variants in disequilibrium' ---" 1>&2
-        plink2 --vcf {input} --indep-pairwise 50 5 0.5 --out results/{wildcards.cluster_assignment}/Population_Structure/Plink-PCA
-        echo -e "--- LOG SECTION END | Plink-2.0 'Filter variants in disequilibrium' ---\n" 1>&2
-
-
-
-        echo -e "\n--- LOG SECTION START | Plink-2.0 'Perform Principle Component Analysis (PCA)' ---" 1>&2
-        plink2 --vcf {input} --exclude results/{wildcards.cluster_assignment}/Population_Structure/Plink-PCA.prune.out --mac 2 --pca allele-wts vzs scols=sid --out results/{wildcards.cluster_assignment}/Population_Structure/Plink-PCA
-        echo -e "--- LOG SECTION END | Plink-2.0 'Perform Principle Component Analysis (PCA)' ---\n" 1>&2
-        """
-
-rule Plink2_Graphs:
-    """
-    A rule to graph the PLink-2.0 PCA's results.
-    """
-    envmodules:
-        config["environment"]["envmodules"]["python-3"]
-    resources:
-        cpus=search("cores", "Plink2_Graphs"),
-        nodes=search("nodes", "Plink2_Graphs"),
-        queue=search("queue", "Plink2_Graphs"),
-        walltime=search("walltime", "Plink2_Graphs"),
-    input:
-        "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec",# `--pca` Eigenvectors
-        "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenval",# `--pca` Eigenvalues
-    output:
-        report(
-            "results/{cluster_assignment}/Population_Structure/Plink-PCA.jpeg", 
-            category="Population Structure", 
-            subcategory="{cluster_assignment}", 
-            caption="report/Plink2_PCA.rst",
-            labels={
-                "Language": "Python",
-                "Library/Software": "Plotly",
-                "Function": "scatter()"
-            }
-        )
-    script:
-        "scripts/Plink_PCA.py"
-
-
-rule DAPC:
-    """
-    An implpementation of the Discriminant Analysis of Principle Components, an altered framework for solving for discriminate components.
-    """
-    resources:
-        cpus=search("cores", "DAPC"),
-        nodes=search("nodes", "DAPC"),
-        queue=search("queue", "DAPC"),
-        walltime=search("walltime", "DAPC"),
-    envmodules:
-        config["environment"]["envmodules"]["r"],
+rule remove_rare_variants:
+    log: outputDir("tmp/{contig}/removed_rare_variants.log"),
+    benchmark: outputDir("tmp/{contig}/removed_rare_variants.benchmark")
+    wildcard_constraints: # TODO: Make this configurable
+        contig=r"[0-9]{1,2}"
     params:
-        cluster_assignments=lambda wildcards: samples[
-            wildcards.cluster_assignment
-        ].tolist(),
+        input=lambda wildcards, input: input["pgen"].replace('.pgen', ""),
+        output=lambda wildcards, output: output["pgen"].replace(".pgen", ""),
     input:
-        "input/All.vcf.gz",
+        pgen=outputDir("tmp/{contig}/extract_provided_region.pgen"),
+        pvar=outputDir("tmp/{contig}/extract_provided_region.pvar.zst"),
+        psam=outputDir("tmp/{contig}/extract_provided_region.psam"),
+        sample_metadata=outputDir("tmp/formatted_sample_metadata/samples.tsv")
     output:
-        report(
-            "results/{cluster_assignment}/Population_Structure/DAPC_scatter_plot.png",
-            category="Population Structure",
-            subcategory="{cluster_assignment}",
-            caption="report/DAPC.rst",
-            labels={
-                "Language": "R",
-                "Library/Software": "Adegenet",
-                "Function": "dapc()"
-            }
-        ),
-        report(
-            "results/{cluster_assignment}/Population_Structure/DAPC_population_inferences.png",
-            category="Population Structure",
-            subcategory="{cluster_assignment}",
-            caption="report/DAPC.rst",
-            labels={
-                "Language": "R",
-                "Library/Software": "Adegenet",
-                "Function": "find.clusters()"
-            }
-        ),
-    script:
-        "scripts/DAPC-PCA.R"
+        pgen=outputDir("tmp/{contig}/removed_rare_variants.pgen"),
+        pvar=outputDir("tmp/{contig}/removed_rare_variants.pvar.zst"),
+        psam=outputDir("tmp/{contig}/removed_rare_variants.psam"),
+    threads: workflow.cores * 0.25
+    shell:
+        """
+        plink2 --threads {threads} --pfile {params.input} vzs --pheno {input.sample_metadata} --mac 2 --make-pgen vzs --out {params.output} >{log} 2>&1
+        """   
 
 
-analysis_files = []
-# Admixture-1.3
-for cluster in [sample for sample in samples.keys() if sample != "sample_name"]:
-    # [SET] cluster assumptions for given annotation set
-    k = len(samples[cluster].unique())
+checkpoint report_fixation_index_per_cluster:
+    log: outputDir("fixation_index/{cluster}/{location}/fixation_index_per_cluster.log")
+    benchmark: outputDir("fixation_index/{cluster}/{location}/fixation_index_per_cluster.benchmark")
+    params:
+        input=lambda wildcards, input: input["pgen"].replace(".pgen", ""),
+        output=lambda wildcards: outputDir(f"fixation_index/{wildcards.cluster}/{wildcards.location}/fixation_index_per_cluster")
+    wildcard_constraints:
+        cluster=r"[a-zA-Z0-9\-]+",
+        location=r"[a-zA-Z0-9\-]+"
+    input:
+        pgen=outputDir("tmp/{contig}/removed_rare_variants.pgen"),
+        pvar=outputDir("tmp/{contig}/removed_rare_variants.pvar.zst"),
+        psam=outputDir("tmp/{contig}/removed_rare_variants.psam"),
+    output:
+        fixation_report=directory(outputDir("fixation_index/{cluster}/{location}/"))
+    threads: workflow.cores * 0.25
+    shell:
+        """
+        plink2 --threads {threads} --pfile {params.input} vzs --fst {wildcards.cluster} report-variants zs --out {params.output} >{log} 2>&1
+        """
 
-    if k > 5:
-        # [SET] a python `set()` to make sure that any buffer-windows whose ranges overlap
-        # will be collapsed to once for the safe of run-requests and duplicate file names.
-        k_buffer=range(k-5,k+6)
-    else:
-        k_buffer=list(range(1,k+6))
-        
-        
-    # [SET] The number of iterations to run for each unique `k` estimation in the buffered windows:
-    replicates=list(range(1,11)) # 10 iterations each
 
-    directoryExists(f"results/{cluster}")
-    directoryExists(f"results/{cluster}/Population_Structure/")
+rule generate_pca:
+    log: outputDir("generate_pca/{location}/pca.log")
+    benchmark: outputDir("generate_pca/{location}/pca.benchmark")
+    wildcard_constraints: # TODO: Make this configurable
+        contig=r"[0-9]{1,2}"
+    params:
+        fromBP=lambda wildcards: locations.loc[locations["location_name"] == wildcards.location, "ld_start"].item(),
+        toBP=lambda wildcards: locations.loc[locations["location_name"] == wildcards.location, "ld_stop"].item(),
+        chr=lambda wildcards: locations.loc[locations["location_name"] == wildcards.location, "chromosome"].item(),
+        input=lambda wildcards, input: input["pgen"].replace(".pgen", ""),
+        output=lambda wildcards: outputDir(f"generate_pca/{wildcards.location}/pca")
+    wildcard_constraints:
+        cluster=r"[a-zA-Z0-9\-]+",
+        location=r"[a-zA-Z0-9\-]+"
+    input:
+        pgen=lambda wildcards: outputDir(f"tmp/{locations.loc[locations["location_name"] == wildcards.location, "chromosome"].item()}/removed_rare_variants.pgen"),
+        pvar=lambda wildcards: outputDir(f"tmp/{locations.loc[locations["location_name"] == wildcards.location, "chromosome"].item()}/removed_rare_variants.pvar.zst"),
+        psam=lambda wildcards: outputDir(f"tmp/{locations.loc[locations["location_name"] == wildcards.location, "chromosome"].item()}/removed_rare_variants.psam"),
+    output:
+        eigenvectors=outputDir("generate_pca/{location}/pca.eigenvec"),
+        eigenvectorsPerAllele=outputDir("generate_pca/{location}/pca.eigenvec.allele"),
+        eigenvalues=outputDir("generate_pca/{location}/pca.eigenval"),
+    threads: workflow.cores * 0.25
+    shell:
+        """
+        plink2 --threads {threads} --pfile {params.input} vzs --from-bp {params.fromBP} --to-bp {params.toBP} --chr {params.chr} --pca allele-wts --out {params.output} >{log} 2>&1
+        """
 
-    # [SET] The dynamic path for file I/O.
-    path = f"results/{cluster}/Population_Structure/plinkPed"
-
-    # [ITERATE] Now we can iterate over the product of the `k_buffer` and `iterations` lists:
-    fileMapRaw = list()
-    for kValue, replicate in product(k_buffer, replicates):
-        fileMapRaw.append(
-            [f"k_{kValue}-replicate_{replicate}",
-            kValue,
-            f"plinkPed.replicate_{replicate}.{kValue}.Q"
-            ]
-        )
-    
-    # [CONVERT] convert to a pandas Dataframe for export
-    fileMap = DataFrame(fileMapRaw)
-
-    # [EXPORT] to the output file
-    fileMap.to_csv(path + ".filemap", header=False, sep="\t", index=False)
-
-    analysis_files.append(
-        
-        expand(
-            [
-                path + ".replicate_{n}.{k}.P",
-                path + ".replicate_{n}.{k}.Q",
-                # path + ".replicate_{n}.{k}.Q_bias",
-                # path + ".replicate_{n}.{k}.Q_se",
-            ],
-            k=k_buffer,
-            n=replicates
-        )
-    )
-        # analysis_files.append(
-        #     expand(
-        #         "results/{cluster_assignment}/Population_Structure/Admixture-1.3_Graph.{k}.jpeg",
-        #         zip,
-        #         cluster_assignment=[
-        #                 grouping_name
-        #                 for grouping_name in samples.keys()
-        #                 if grouping_name != "sample_name"
-        #             ],
-        #         k=[len(groups) for groups in [samples[k].unique() for k in  [
-        #                 grouping_name
-        #                 for grouping_name in samples.keys()
-        #                 if grouping_name != "sample_name"
-        #             ]]]
-        #     )
-        # )
-
-# DAPC
-# for cluster in [sample for sample in samples.keys() if sample != "sample_name"]:
-#     if len(samples[cluster].unique()) > 3:
-#         analysis_files.append(
-#                 [
-#                     f"results/{cluster}/Population_Structure/DAPC_scatter_plot.png",
-#                     f"results/{cluster}/Population_Structure/DAPC_population_inferences.png",
-#                 ]
-#         )
-
-# Plink-2.0 min 50 samples limit or pipeline go boom
-for cluster in [sample for sample in samples.keys() if sample != "sample_name"]:
-    if len(samples[cluster].unique()) > 1 and not len(samples.index) < 50:
-        # Plink-2.0
-        analysis_files.append(
-            expand(
-                [
-                    "results/{cluster_assignment}/Population_Structure/Plink-PCA.prune.in",
-                    "results/{cluster_assignment}/Population_Structure/Plink-PCA.prune.out",
-                    "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec",# `--pca` Eigenvectors
-                    "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenval",# `--pca` Eigenvalues
-                    "results/{cluster_assignment}/Population_Structure/Plink-PCA.eigenvec.allele.zst", # `--pca` Allele weights
-                ],
-                cluster_assignment=[
-                    grouping_name
-                    for grouping_name in samples.keys()
-                    if grouping_name != "sample_name"
-                ],
-            )
-        )
-        analysis_files.append(
-            expand(
-                "results/{cluster_assignment}/Population_Structure/Plink-PCA.jpeg",
-                cluster_assignment=[
-                    grouping_name
-                    for grouping_name in samples.keys()
-                    if grouping_name != "sample_name"
-                ]
-            )
-        )
 
 rule all:
     """
@@ -378,4 +154,6 @@ rule all:
     """
     default_target: True
     input:
-        analysis_files,
+        expand(outputDir("generate_pca/{location}/pca.eigenvec"), location=locations["location_name"]),
+        expand(outputDir("generate_pca/{location}/pca.eigenvec.allele"), location=locations["location_name"]),
+        expand(outputDir("generate_pca/{location}/pca.eigenval"), location=locations["location_name"])
