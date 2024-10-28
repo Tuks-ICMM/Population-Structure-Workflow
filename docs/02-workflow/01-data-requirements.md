@@ -1,9 +1,10 @@
 ---
-title: Data Requirements
-permalink: overview/data-requirements
+title: Data
+permalink: workflow/data
 layout: page
 nav_order: 1
 parent: Workflow
+has_children: false
 ---
 
 # Data Requirements
