@@ -4,6 +4,7 @@ permalink: workflow/analysis
 layout: page
 nav_order: 2
 parent: Workflow
+has_children: false
 ---
 
 # Configuration

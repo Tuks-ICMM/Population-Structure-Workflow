@@ -4,6 +4,7 @@ layout: page
 permalink: reference-material/data-input
 nav_order: 2
 parent: Reference material
+has_children: false
 ---
 
 # Data input

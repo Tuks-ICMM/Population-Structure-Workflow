@@ -4,6 +4,7 @@ layout: page
 permalink: reference-material/quickstart
 nav_order: 1
 parent: Reference material
+has_children: false
 ---
 
 # Quickstart
