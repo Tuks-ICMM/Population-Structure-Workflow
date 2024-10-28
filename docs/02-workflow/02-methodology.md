@@ -1,13 +1,13 @@
 ---
-title: Analysis
-permalink: workflow/analysis
+title: Methodology
+permalink: workflow/methodology
 layout: page
 nav_order: 2
 parent: Workflow
 has_children: false
 ---
 
-# Configuration
+# Methodology
 {: .no_toc }
 
 A breakdown of the process used in this workflow and how it has been implemented.
@@ -36,6 +36,9 @@ Reference Genome Configuration
   ```mermaid
 ---
 title: Population Structure Workflow
+config:
+    flowchart:
+        defaultRenderer: elk
 ---
 flowchart TB
   subgraph population_structure_workflow[Population Structure Workflow]
