@@ -1,7 +1,7 @@
 ---
-title: Reference material
+title: Quick Reference
 layout: home
-permalink: /
+permalink: quick-reference
 nav_order: 3
 has_children: true
 ---
