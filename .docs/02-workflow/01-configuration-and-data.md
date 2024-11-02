@@ -1,6 +1,6 @@
 ---
-title: Data
-permalink: workflow/data
+title:  Configuration & Data
+permalink: workflow/configuration-and-data
 layout: page
 nav_order: 1
 parent: Workflow
@@ -10,20 +10,8 @@ has_children: false
 # Data Requirements
 {: .no_toc}
 
-What files do I need to provide as inputs for this analysis?
+A summary of the required data and input files needed to perform an analysis.
 {: .fs-6 .fw-300 }
-
-Datasets
-{: .label }
-
-Sample Metadata
-{: .label }
-
-Genomic Location Metadata
-{: .label }
-
-Transcript Selection
-{: .label }
 
 <details markdown="block">
   <summary>
@@ -44,8 +32,8 @@ This page describes the information needed to run the {{ site.title }}. Below we
 This workflow makes use of an analysis manifest to encapsulate all analysis variables used. This manifest file collects and connects the metadata for your samples, datasets, and relevant reference resources (Reference Genomes, etc) together. Doing so allows the workflow to programmatically access clusters through sample annotations, which is required in order to produce cluster-level reports.
 
 <details markdown="block" open>
-    <summary>Input Data Infographic</summary>
-    {: .text-delta }
+  <summary>Input Data Infographic</summary>
+  {: .text-delta }
 
 {% raw %}
 ```mermaid
@@ -253,5 +241,3 @@ The sample metadata file allows you to declare samples and provide the necessary
 | HG002           | HG004       | `SAS`     | `GIH`   |
 
 </details>
-
----
