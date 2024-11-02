@@ -1,19 +1,23 @@
 {
-    "reference-genomes": [
-        {
-            "version": "GRCh38",
-            "file_path": [
-                "/",
-                "nlustre",
-                "users",
-                "graeme",
-                "ARCHIVE_Public",
-                "REFERENCE_GRCh38",
-                "GRCh38.fa.gz"
-            ]
-        }
-    ],
-    "output-dir": [
+    "input": {
+        "locations": [
+            "/",
+            "mnt",
+            "ICMM_HDD_12TB",
+            "",
+            "input",
+            ""
+        ],
+        "samples": [
+            "/",
+            "mnt",
+            "ICMM_HDD_12TB",
+            "",
+            "input",
+            ""
+        ]
+    },
+    "output": [
         "/",
         "mnt",
         "ICMM_HDD_12TB",

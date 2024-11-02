@@ -1,0 +1,42 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "description": "A configuration file for the Population Structure Workflow",
+    "type": "object",
+    "required": [
+        "input",
+        "output",
+        "resources"
+    ],
+    "properties": {
+        "input": {
+            "type": "object",
+            "required": [
+                "locations",
+                "samples"
+            ],
+            "properties": {
+                "locations": {
+                    "type": "list",
+                    "minItems": 1,
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "samples": {
+                    "type": "list",
+                    "minItems": 1,
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "output": {
+            "type": "list",
+            "minItems": 1,
+            "items": {
+                "type": "string"
+            }
+        }
+    }
+}
