@@ -16,14 +16,14 @@
             ],
             "properties": {
                 "locations": {
-                    "type": "list",
+                    "type": "array",
                     "minItems": 1,
                     "items": {
                         "type": "string"
                     }
                 },
                 "samples": {
-                    "type": "list",
+                    "type": "array",
                     "minItems": 1,
                     "items": {
                         "type": "string"
@@ -32,7 +32,7 @@
             }
         },
         "output": {
-            "type": "list",
+            "type": "array",
             "minItems": 1,
             "items": {
                 "type": "string"
