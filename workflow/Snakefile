@@ -1,7 +1,7 @@
 from pandas import read_csv, DataFrame
 from itertools import product
 from os.path import join, isfile
-from snakemake.utils import min_version
+from snakemake.utils import min_version, validate
 from snakemake.io import expand
 
 __author__ = "Graeme Ford"
