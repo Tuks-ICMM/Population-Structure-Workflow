@@ -37,14 +37,10 @@ samples = read_csv(join("input", "samples.csv"), header=0)
 # [IMPORT] Custom functions to connect checkpoints with variable outputs
 include: "rules/checkpoint_connectors.smk"
 
-# SET CLUSTER CATEGORIES
-cluster_assignments = set(
-    [
-        grouping_category
-        for grouping_category in samples.keys()
-        if grouping_category != "sample_name"
-    ]
-)
+
+# DEFINE CONTEXT-VARIABLES:
+clusters = set([cluster for cluster in samples.keys() if cluster not in ["sample_name", "dataset"]])
+
 
 
 rule extract_provided_region:
