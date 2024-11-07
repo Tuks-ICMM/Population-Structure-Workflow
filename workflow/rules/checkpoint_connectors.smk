@@ -4,6 +4,6 @@ def collect_calculate_linkage_disequilibrium_per_cluster(wildcards) -> list[str]
     for location in locations["location_name"].unique().tolist():
         for cluster in clusters:
             LD_output.append(
-                directory(outputDir(f"linkage_disequilibrium/{cluster}/{location}/"))
+                directory(out(f"linkage_disequilibrium/{cluster}/{location}/"))
             )
     return LD_output
