@@ -145,6 +145,32 @@ rule generate_pca:
         """
 
 
+checkpoint calculate_linkage_disequilibrium_per_cluster:
+    log: outputDir("linkage_disequilibrium/{cluster}/{location}/calculated_linkage_disequilibrium_per_cluster.log")
+    benchmark: outputDir("linkage_disequilibrium/{cluster}/{location}/calculated_linkage_disequilibrium_per_cluster.benchmark")
+    wildcard_constraints: # TODO: Make this configurable
+        contig=r"[0-9]{1,2}"
+    params:
+        fromBP=lambda wildcards: locations.loc[locations["location_name"] == wildcards.location, "ld_start"].item(),
+        toBP=lambda wildcards: locations.loc[locations["location_name"] == wildcards.location, "ld_stop"].item(),
+        chr=lambda wildcards: locations.loc[locations["location_name"] == wildcards.location, "chromosome"].item(),
+        input=lambda wildcards, input: input["pgen"].replace(".pgen", ""),
+        output=lambda wildcards: outputDir(f"linkage_disequilibrium/{wildcards.cluster}/{wildcards.location}/calculated_linkage_disequilibrium_per_cluster")
+    wildcard_constraints:
+        cluster=r"[a-zA-Z0-9\-]+",
+        location=r"[a-zA-Z0-9\-]+"
+    input:
+        pgen=lambda wildcards: outputDir(f"tmp/{locations.loc[locations["location_name"] == wildcards.location, "chromosome"].item()}/removed_rare_variants.pgen"),
+        pvar=lambda wildcards: outputDir(f"tmp/{locations.loc[locations["location_name"] == wildcards.location, "chromosome"].item()}/removed_rare_variants.pvar.zst"),
+        psam=lambda wildcards: outputDir(f"tmp/{locations.loc[locations["location_name"] == wildcards.location, "chromosome"].item()}/removed_rare_variants.psam"),
+    output:
+        linkage_report=directory(outputDir("linkage_disequilibrium/{cluster}/{location}/"))
+    threads: workflow.cores * 0.25
+    shell:
+        """
+        plink2 --threads {threads} --pfile {params.input} vzs --loop-cats {wildcards.cluster} --from-bp {params.fromBP} --to-bp {params.toBP} --chr {params.chr} --r2-unphased yes-really zs cols=chrom,pos,id,ref,alt,provref,maj --out {params.output} >{log} 2>&1
+        """
+
 rule all:
     """
     Full suite of analyses to describe population structure using both parametric and non-parametric methods.
@@ -153,4 +179,5 @@ rule all:
     input:
         expand(out("generate_pca/{location}/pca.eigenvec"), location=locations["location_name"]),
         expand(out("generate_pca/{location}/pca.eigenvec.allele"), location=locations["location_name"]),
-        expand(out("generate_pca/{location}/pca.eigenval"), location=locations["location_name"])
+        expand(out("generate_pca/{location}/pca.eigenval"), location=locations["location_name"]),
+        collect_calculate_linkage_disequilibrium_per_cluster,
