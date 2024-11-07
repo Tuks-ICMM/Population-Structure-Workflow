@@ -34,6 +34,9 @@ include: "rules/common.smk"
 locations = read_csv(join("input", "locations.csv"), header=0)
 samples = read_csv(join("input", "samples.csv"), header=0)
 
+# [IMPORT] Custom functions to connect checkpoints with variable outputs
+include: "rules/checkpoint_connectors.smk"
+
 # SET CLUSTER CATEGORIES
 cluster_assignments = set(
     [
