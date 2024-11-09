@@ -89,7 +89,7 @@ rule remove_rare_variants:
     threads: workflow.cores * 0.25
     shell:
         """
-        plink2 --threads {threads} --pfile {params.input} vzs --pheno {input.sample_metadata} --mac 2 --make-pgen vzs --out {params.output} >{log} 2>&1
+        plink2 --threads {threads} --pfile {params.input} vzs --pheno {input.sample_metadata} --maf {config[parameters][rare-variant-frequency-cutoff]} --make-pgen vzs --out {params.output} >{log} 2>&1
         """   
 
 
@@ -176,6 +176,12 @@ rule all:
     """
     default_target: True
     input:
+        expand(out("tmp/{location}/extract_provided_region.pgen"), location=locations["chromosome"].unique().tolist()),
+        expand(out("tmp/{location}/extract_provided_region.pvar.zst"), location=locations["chromosome"].unique().tolist()),
+        expand(out("tmp/{location}/extract_provided_region.psam"), location=locations["chromosome"].unique().tolist()),
+        expand(out("tmp/{contig}/removed_rare_variants.pgen"), contig=locations["chromosome"].unique().tolist()),
+        expand(out("tmp/{contig}/removed_rare_variants.pvar.zst"), contig=locations["chromosome"].unique().tolist()),
+        expand(out("tmp/{contig}/removed_rare_variants.psam"), contig=locations["chromosome"].unique().tolist()),
         expand(out("generate_pca/{location}/pca.eigenvec"), location=locations["location_name"]),
         expand(out("generate_pca/{location}/pca.eigenvec.allele"), location=locations["location_name"]),
         expand(out("generate_pca/{location}/pca.eigenval"), location=locations["location_name"]),

@@ -22,5 +22,8 @@
         "mnt",
         "ICMM_HDD_12TB",
         "Results_25SEP2024"
-    ]
+    ],
+    "parameters": {
+        "rare-variant-frequency-cutoff": 0.1
+    }
 }
