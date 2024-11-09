@@ -185,4 +185,4 @@ rule all:
         expand(out("generate_pca/{location}/pca.eigenvec"), location=locations["location_name"]),
         expand(out("generate_pca/{location}/pca.eigenvec.allele"), location=locations["location_name"]),
         expand(out("generate_pca/{location}/pca.eigenval"), location=locations["location_name"]),
-        collect_calculate_linkage_disequilibrium_per_cluster,
+        # collect_calculate_linkage_disequilibrium_per_cluster,
