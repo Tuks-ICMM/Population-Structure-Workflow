@@ -4,7 +4,7 @@ def collect_calculate_linkage_disequilibrium_per_cluster(wildcards) -> list[str]
         for cluster in clusters:
             checkpoint_output = checkpoints.calculate_linkage_disequilibrium_per_cluster.get(
                     cluster=cluster, location=location
-                ).output["linakge_reports"]
+                ).output["linkage_reports"]
             
             populations = glob_wildcards(
                 join(
