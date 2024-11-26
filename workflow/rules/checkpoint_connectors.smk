@@ -6,11 +6,10 @@ def collect_calculate_linkage_disequilibrium_per_cluster(wildcards) -> list[str]
             #         cluster=cluster, location=location
             #     ).output["linkage_reports"]
             LD_output.extend(
-                expand(
-                    directory(out("linkage_disequilibrium/{cluster}/{location}/")),
+                    directory(out(f"linkage_disequilibrium/{cluster}/{location}/")),
                     cluster=cluster,
                     location=location,
                 )
-            )
+            
     print("Linkage Output: ", LD_output)
     return LD_output
