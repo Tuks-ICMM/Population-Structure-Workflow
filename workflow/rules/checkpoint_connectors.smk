@@ -6,6 +6,7 @@ def collect_calculate_linkage_disequilibrium_per_cluster(wildcards) -> list[str]
                     cluster=cluster, location=location
                 ).output["linkage_reports"]
             
+
             populations = glob_wildcards(
                 join(
                     checkpoint_output,
@@ -15,7 +16,12 @@ def collect_calculate_linkage_disequilibrium_per_cluster(wildcards) -> list[str]
             LD_output.extend(
                 expand(
                     out(
-                        "linkage_disequilibrium/{cluster}/{location}/calculated_linkage_disequilibrium_per_cluster.{population}.vcor.zst"
+                        join(
+                            "linkage_disequilibrium",
+                            "{cluster}",
+                            "{location}",
+                            "calculated_linkage_disequilibrium_per_cluster.{population}.vcor.zst",
+                        )
                     ),
                     cluster=cluster,
                     location=location,
