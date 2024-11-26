@@ -28,4 +28,5 @@ def collect_calculate_linkage_disequilibrium_per_cluster() -> list[str]:
                     population=populations,
                 )
             )
+    print("Linkage Output: ", LD_output)
     return LD_output
