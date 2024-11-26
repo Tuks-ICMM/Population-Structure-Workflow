@@ -12,7 +12,7 @@ def collect_calculate_linkage_disequilibrium_per_cluster(wildcards) -> list[str]
                     "calculated_linkage_disequilibrium_per_cluster.{populations}.vcor.zst",
                 )
             ).populations
-            LD_output.append(
+            LD_output.extend(
                 expand(
                     out(
                         "linkage_disequilibrium/{cluster}/{location}/calculated_linkage_disequilibrium_per_cluster.{population}.vcor.zst"
