@@ -1,7 +1,7 @@
 def collect_calculate_linkage_disequilibrium_per_cluster() -> list[str]:
     LD_output = list()
-    for location in locations["location_name"].unique().tolist():
-        for cluster in clusters:
+    for cluster in clusters:
+        for location in locations["location_name"].unique().tolist():
             checkpoint_output = checkpoints.calculate_linkage_disequilibrium_per_cluster.get(
                     cluster=cluster, location=location
                 ).output["linkage_reports"]
