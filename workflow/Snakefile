@@ -31,8 +31,8 @@ validate(config, join("..", "config", ".schema", "manifest.schema.json"))
 include: "rules/common.smk"
 
 # IMPORT METADATA
-locations = read_csv(join(config["input"]["locations"]), header=0)
-samples = read_csv(join(config["input"]["samples"]), header=0)
+locations = read_csv(join(*config["input"]["locations"]), header=0)
+samples = read_csv(join(*config["input"]["samples"]), header=0)
 
 # [IMPORT] Custom functions to connect checkpoints with variable outputs
 include: "rules/checkpoint_connectors.smk"
