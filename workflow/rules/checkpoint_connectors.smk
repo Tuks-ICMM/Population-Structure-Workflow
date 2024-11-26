@@ -1,4 +1,4 @@
-def collect_calculate_linkage_disequilibrium_per_cluster(wildcards) -> list[str]:
+def collect_calculate_linkage_disequilibrium_per_cluster() -> list[str]:
     LD_output = list()
     for location in locations["location_name"].unique().tolist():
         for cluster in clusters:
