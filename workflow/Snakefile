@@ -147,8 +147,6 @@ rule generate_pca:
 checkpoint calculate_linkage_disequilibrium_per_cluster:
     log: out("linkage_disequilibrium/{cluster}/{location}/calculated_linkage_disequilibrium_per_cluster.log")
     benchmark: out("linkage_disequilibrium/{cluster}/{location}/calculated_linkage_disequilibrium_per_cluster.benchmark")
-    wildcard_constraints: # TODO: Make this configurable
-        contig=r"[0-9]{1,2}"
     params:
         fromBP=lambda wildcards: locations.loc[locations["location_name"] == wildcards.location, "ld_start"].item(),
         toBP=lambda wildcards: locations.loc[locations["location_name"] == wildcards.location, "ld_stop"].item(),
