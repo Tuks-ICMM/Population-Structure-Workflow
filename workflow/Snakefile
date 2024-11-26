@@ -163,7 +163,7 @@ checkpoint calculate_linkage_disequilibrium_per_cluster:
         pvar=lambda wildcards: out(f"tmp/{locations.loc[locations["location_name"] == wildcards.location, "chromosome"].item()}/removed_rare_variants.pvar.zst"),
         psam=lambda wildcards: out(f"tmp/{locations.loc[locations["location_name"] == wildcards.location, "chromosome"].item()}/removed_rare_variants.psam"),
     output:
-        linkage_report=directory(out("linkage_disequilibrium/{cluster}/{location}/"))
+        linkage_reports=directory(out("linkage_disequilibrium/{cluster}/{location}/"))
     threads: workflow.cores * 0.25
     shell:
         """
@@ -185,4 +185,4 @@ rule all:
         expand(out("generate_pca/{location}/pca.eigenvec"), location=locations["location_name"]),
         expand(out("generate_pca/{location}/pca.eigenvec.allele"), location=locations["location_name"]),
         expand(out("generate_pca/{location}/pca.eigenval"), location=locations["location_name"]),
-        # collect_calculate_linkage_disequilibrium_per_cluster,
+        collect_calculate_linkage_disequilibrium_per_cluster,
