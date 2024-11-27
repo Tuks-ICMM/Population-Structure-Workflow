@@ -2,26 +2,26 @@
     "input": {
         "locations": [
             "/",
-            "mnt",
-            "ICMM_HDD_12TB",
-            "",
-            "input",
-            ""
+            "path",
+            "to",
+            "my",
+            "locations.csv"
         ],
         "samples": [
             "/",
-            "mnt",
-            "ICMM_HDD_12TB",
-            "",
-            "input",
-            ""
+            "path",
+            "to",
+            "my",
+            "samples.csv"
         ]
     },
     "output": [
         "/",
-        "mnt",
-        "ICMM_HDD_12TB",
-        "Results_25SEP2024"
+        "path",
+        "to",
+        "my",
+        "output",
+        "folder"
     ],
     "parameters": {
         "rare-variant-frequency-cutoff": 0.1
