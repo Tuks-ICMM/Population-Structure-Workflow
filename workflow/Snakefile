@@ -140,7 +140,7 @@ rule generate_pca:
     threads: workflow.cores * 0.25
     shell:
         """
-        plink2 --threads {threads} --pfile {params.input} vzs --from-bp {params.fromBP} --to-bp {params.toBP} --chr {params.chr} --pca allele-wts --out {params.output} >{log} 2>&1
+        plink2 --threads {threads} --pfile {params.input} vzs --from-bp {params.fromBP} --to-bp {params.toBP} --chr {params.chr} --pca allele-wts POS --out {params.output} >{log} 2>&1
         """
 
 
